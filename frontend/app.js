@@ -179,25 +179,61 @@ function updateTimerDisplay() {
 }
 
 // --- Custom Modal Override ---
+window.customConfirm = function(message) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('custom-modal');
+        if (!modal) {
+            resolve(window.confirm(message));
+            return;
+        }
+
+        document.getElementById('modal-message').innerText = message;
+        const confirmBtn = document.getElementById('modal-close-btn');
+        const cancelBtn = document.getElementById('modal-cancel-btn');
+        
+        cancelBtn.classList.remove('hidden');
+        confirmBtn.textContent = 'OK';
+        modal.classList.add('active');
+
+        const cleanup = () => {
+            confirmBtn.removeEventListener('click', onConfirm);
+            cancelBtn.removeEventListener('click', onCancel);
+            modal.classList.remove('active');
+            cancelBtn.classList.add('hidden');
+        };
+
+        const onConfirm = () => { cleanup(); resolve(true); };
+        const onCancel = () => { cleanup(); resolve(false); };
+
+        confirmBtn.addEventListener('click', onConfirm);
+        cancelBtn.addEventListener('click', onCancel);
+    });
+};
+
 window.alert = function(message) {
     const modal = document.getElementById('custom-modal');
-    if (modal) {
-        document.getElementById('modal-message').innerText = message;
-        modal.classList.add('active');
-    } else {
+    if (!modal) {
         console.warn("Alert fallback:", message);
+        return;
     }
+
+    document.getElementById('modal-message').innerText = message;
+    const confirmBtn = document.getElementById('modal-close-btn');
+    const cancelBtn = document.getElementById('modal-cancel-btn');
+    
+    cancelBtn.classList.add('hidden');
+    confirmBtn.textContent = 'OK';
+    modal.classList.add('active');
+
+    const cleanup = () => {
+        confirmBtn.removeEventListener('click', cleanup);
+        modal.classList.remove('active');
+    };
+    confirmBtn.addEventListener('click', cleanup);
 };
 
 // --- Event Listeners ---
 function initEventListeners() {
-    // Custom Modal Close Event
-    const modalCloseBtn = document.getElementById('modal-close-btn');
-    if (modalCloseBtn) {
-        modalCloseBtn.addEventListener('click', () => {
-            document.getElementById('custom-modal').classList.remove('active');
-        });
-    }
 
     // Subject selector
     subjectSelect.addEventListener('change', (e) => {
@@ -227,7 +263,7 @@ function initEventListeners() {
 
     // Preset Selection
     document.querySelectorAll('.preset-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
             document.querySelectorAll('.preset-btn').forEach(p => p.classList.remove('active'));
             
             const target = e.currentTarget;
@@ -236,16 +272,16 @@ function initEventListeners() {
             const minutes = parseInt(target.getAttribute('data-minutes'));
             const mode = target.getAttribute('data-mode');
             
-            setTimerPreset(minutes, mode);
+            await setTimerPreset(minutes, mode);
         });
     });
 
     // Custom minutes apply
-    applyCustomBtn.addEventListener('click', () => {
+    applyCustomBtn.addEventListener('click', async () => {
         const val = parseInt(customMinutesInput.value);
         if (val && val > 0 && val < 1000) {
             document.querySelectorAll('.preset-btn').forEach(p => p.classList.remove('active'));
-            setTimerPreset(val, 'focus');
+            await setTimerPreset(val, 'focus');
             customMinutesInput.value = '';
         }
     });
@@ -283,7 +319,7 @@ function initEventListeners() {
 
     // Clear history logs
     clearHistoryBtn.addEventListener('click', async () => {
-        if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử phiên học?')) {
+        if (await window.customConfirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử phiên học?')) {
             if (!backendOffline) {
                 try {
                     const headers = {};
@@ -357,9 +393,9 @@ async function saveCustomSubject() {
     newSubjectForm.classList.add('hidden');
 }
 
-function setTimerPreset(minutes, mode) {
+async function setTimerPreset(minutes, mode) {
     if (timerState === 'running') {
-        if (!confirm('Bạn có muốn dừng phiên hiện tại để đổi mốc thời gian?')) {
+        if (!(await window.customConfirm('Bạn có muốn dừng phiên hiện tại để đổi mốc thời gian?'))) {
             return;
         }
         pauseTimer();

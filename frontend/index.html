@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.0.8">
+    <link rel="stylesheet" href="style.css?v=1.0.9">
 </head>
 <body>
     <!-- Background grid overlay -->
@@ -320,7 +320,10 @@
             <div class="modal-icon">🔔</div>
             <h3 class="modal-title">Thông báo</h3>
             <p id="modal-message" class="modal-message"></p>
-            <button id="modal-close-btn" class="btn-control btn-play">Đồng ý</button>
+            <div style="display: flex; gap: 12px; width: 100%; justify-content: center; margin-top: 15px;">
+                <button id="modal-cancel-btn" class="btn-control hidden" style="background: rgba(255,255,255,0.1); color: #fff;">Hủy</button>
+                <button id="modal-close-btn" class="btn-control btn-play">Đồng ý</button>
+            </div>
         </div>
     </div>
 
@@ -329,6 +332,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
     <!-- Youtube IFrame Player API script will be loaded dynamically by app.js -->
-    <script src="app.js?v=1.0.2"></script>
+    <script src="app.js?v=1.0.3"></script>
 </body>
 </html>
