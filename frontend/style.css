@@ -697,6 +697,11 @@ body {
     outline: none;
 }
 
+.playlist-select option {
+    background-color: #121212;
+    color: var(--text-white);
+}
+
 .playlist-select:hover {
     border-color: var(--card-border-hover);
 }
