@@ -602,9 +602,10 @@ body {
 /* Hidden YouTube component box but needs sizes for APIs to work */
 #youtube-player {
     position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0;
+    width: 240px;
+    height: 180px;
+    opacity: 0.01;
+    z-index: -1;
     pointer-events: none;
 }
 

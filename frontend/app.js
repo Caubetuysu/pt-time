@@ -683,13 +683,6 @@ function loadSelectedPlaylist() {
             index: 0
         });
     }
-    
-    // Auto play
-    setTimeout(() => {
-        try {
-            ytPlayer.playVideo();
-        } catch(e) {}
-    }, 500);
 }
 
 function playNextYt() {
