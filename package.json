@@ -1,0 +1,9 @@
+{
+  "name": "zentime-root",
+  "version": "1.0.0",
+  "description": "Root package for ZenTime deployment",
+  "scripts": {
+    "build": "npm install --prefix backend",
+    "start": "node backend/server.js"
+  }
+}
