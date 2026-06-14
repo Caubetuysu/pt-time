@@ -645,6 +645,11 @@ function onPlayerStateChange(event) {
         vinyl.classList.remove('playing');
     } else if (event.data === YT.PlayerState.BUFFERING) {
         statusText.innerText = 'Đang tải đệm YouTube...';
+    } else if (event.data === YT.PlayerState.CUED || event.data === YT.PlayerState.UNSTARTED) {
+        statusText.innerText = 'Sẵn sàng. Hãy nhấn Play!';
+        iconPlay.classList.remove('hidden');
+        iconPause.classList.add('hidden');
+        vinyl.classList.remove('playing');
     }
 }
 
