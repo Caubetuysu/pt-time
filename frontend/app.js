@@ -54,6 +54,8 @@ let rainGainNode = null;
 // YouTube Player State
 let ytPlayer = null;
 let ytPlayerReady = false;
+let ytCampfirePlayer = null;
+let ytCampfireReady = false;
 
 // --- DOM Elements ---
 const subjectSelect = document.getElementById('subject-select');
@@ -420,6 +422,7 @@ function startTimer() {
     playPauseText.textContent = 'Tạm dừng';
     
     updateControlBtnStyles();
+    timerCircleProgress.classList.add('running-pulse');
     
     // Accurate Timer loop (compensated for background tab delays)
     timerInterval = setInterval(() => {
@@ -449,6 +452,7 @@ function pauseTimer() {
     playPauseText.textContent = 'Tiếp tục';
     
     updateControlBtnStyles();
+    timerCircleProgress.classList.remove('running-pulse');
     timerSublabel.textContent = 'Đã tạm dừng';
 }
 
@@ -531,78 +535,22 @@ function playAlarmSound() {
     }
 }
 
-// --- Web Audio Rain Noise Generator ---
+// --- Ambient Campfire Sound (YouTube) ---
 function initRainSound() {
-    try {
-        if (!audioContext) {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-        
-        if (audioContext.state === 'suspended') {
-            audioContext.resume();
-        }
-        
-        // Brownian noise generation algorithm for rain sound
-        const bufferSize = 2 * audioContext.sampleRate;
-        const noiseBuffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-        const output = noiseBuffer.getChannelData(0);
-        
-        let lastOut = 0.0;
-        for (let i = 0; i < bufferSize; i++) {
-            const white = Math.random() * 2 - 1;
-            output[i] = (lastOut + (0.02 * white)) / 1.02;
-            lastOut = output[i];
-            output[i] *= 4.0; // Boost volume slightly
-        }
-        
-        const noiseSource = audioContext.createBufferSource();
-        noiseSource.buffer = noiseBuffer;
-        noiseSource.loop = true;
-        
-        // Soft low frequency rumble
-        const lowpass = audioContext.createBiquadFilter();
-        lowpass.type = 'lowpass';
-        lowpass.frequency.setValueAtTime(700, audioContext.currentTime);
-        
-        // Rain droplets peak frequencies
-        const peakFilter = audioContext.createBiquadFilter();
-        peakFilter.type = 'peaking';
-        peakFilter.frequency.setValueAtTime(2200, audioContext.currentTime);
-        peakFilter.Q.setValueAtTime(1.2, audioContext.currentTime);
-        peakFilter.gain.setValueAtTime(5.0, audioContext.currentTime);
-        
-        // Gain Node
-        rainGainNode = audioContext.createGain();
-        const currentVol = parseFloat(rainVolumeSlider.value) / 100;
-        rainGainNode.gain.setValueAtTime(currentVol * 0.4, audioContext.currentTime); // Volume scaling
-        
-        // Connections
-        noiseSource.connect(lowpass);
-        lowpass.connect(peakFilter);
-        peakFilter.connect(rainGainNode);
-        rainGainNode.connect(audioContext.destination);
-        
-        noiseSource.start(0);
-        rainNode = noiseSource;
-    } catch (e) {
-        console.error('Không thể khởi động âm thanh mưa: ', e);
+    if (ytCampfireReady && ytCampfirePlayer) {
+        ytCampfirePlayer.playVideo();
     }
 }
 
 function stopRainSound() {
-    if (rainNode) {
-        try {
-            rainNode.stop();
-        } catch (e) {}
-        rainNode.disconnect();
-        rainNode = null;
+    if (ytCampfireReady && ytCampfirePlayer) {
+        ytCampfirePlayer.pauseVideo();
     }
 }
 
 function setRainVolume(val) {
-    if (rainGainNode && audioContext) {
-        const volumeVal = (parseFloat(val) / 100) * 0.4;
-        rainGainNode.gain.setValueAtTime(volumeVal, audioContext.currentTime);
+    if (ytCampfireReady && ytCampfirePlayer) {
+        ytCampfirePlayer.setVolume(parseInt(val));
     }
 }
 
@@ -639,6 +587,27 @@ window.onYouTubeIframeAPIReady = function() {
             'onReady': onPlayerReady,
             'onStateChange': onPlayerStateChange,
             'onError': onPlayerError
+        }
+    });
+
+    ytCampfirePlayer = new YT.Player('campfire-player', {
+        height: '1',
+        width: '1',
+        videoId: 'E69OzjqVWQc',
+        host: 'https://www.youtube-nocookie.com',
+        playerVars: {
+            autoplay: 0,
+            controls: 0,
+            disablekb: 1,
+            loop: 1,
+            playlist: 'E69OzjqVWQc', // required for loop
+            origin: window.location.origin
+        },
+        events: {
+            'onReady': function(e) {
+                ytCampfireReady = true;
+                e.target.setVolume(parseInt(rainVolumeSlider.value));
+            }
         }
     });
 };

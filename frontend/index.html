@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.0.4">
+    <link rel="stylesheet" href="style.css?v=1.0.5">
 </head>
 <body>
     <!-- Background grid overlay -->
@@ -250,15 +250,16 @@
                             <!-- Ambient Natural Sounds Mixer -->
                             <div class="ambient-mixer" style="margin-top: 4px; padding-top: 10px;">
                                 <div class="mixer-header">
-                                    <span class="mixer-title">Trộn tiếng mưa (Web Audio Rain)</span>
+                                    <span class="mixer-title">Trộn tiếng lửa trại (Campfire)</span>
                                     <div class="toggle-wrapper">
                                         <input type="checkbox" id="rain-toggle" class="toggle-checkbox">
                                         <label for="rain-toggle" class="toggle-label"></label>
                                     </div>
                                 </div>
+                                <div id="campfire-player" style="display: none;"></div>
                                 <div class="slider-group">
-                                    <span class="slider-icon">🌧️</span>
-                                    <input type="range" id="rain-volume" class="slider-bar" min="0" max="100" value="30" disabled aria-label="Âm lượng tiếng mưa">
+                                    <span class="slider-icon">🔥</span>
+                                    <input type="range" id="rain-volume" class="slider-bar" min="0" max="100" value="30" disabled aria-label="Âm lượng lửa trại">
                                     <span id="rain-volume-percent" class="slider-val">30%</span>
                                 </div>
                             </div>
