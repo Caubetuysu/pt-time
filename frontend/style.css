@@ -105,10 +105,10 @@ body {
 .app-container {
     width: 100%;
     max-width: 1200px;
-    padding: 20px;
+    padding: 12px 20px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 10px;
     min-height: 100vh;
     justify-content: flex-start;
     margin: 0 auto;
@@ -261,7 +261,7 @@ body {
     background-color: var(--card-bg);
     border: 1px solid var(--card-border);
     border-radius: 20px;
-    padding: 20px;
+    padding: 14px 18px;
     transition: border-color 0.4s ease;
     position: relative;
     overflow: hidden;
@@ -272,10 +272,10 @@ body {
 }
 
 .card-title {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 500;
     letter-spacing: 0.05rem;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     text-transform: uppercase;
     color: var(--text-muted);
     border-left: 2px solid rgba(255, 255, 255, 0.1);
@@ -301,9 +301,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 40px 24px;
-    min-height: 450px;
+    padding: 20px 24px;
+    min-height: 380px;
 }
 
 .timer-badge-container {
@@ -336,12 +335,12 @@ body {
 
 .timer-circle-container {
     position: relative;
-    width: 260px;
-    height: 260px;
+    width: 220px;
+    height: 220px;
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .timer-svg {
@@ -591,11 +590,11 @@ body {
     background: #020202;
     border: 1px solid var(--card-border);
     border-radius: 14px;
-    padding: 12px;
-    margin-bottom: 16px;
+    padding: 8px 12px;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 12px;
     position: relative;
 }
 
@@ -678,7 +677,7 @@ body {
 .player-controls {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 8px;
     position: relative;
     z-index: 10;
 }
@@ -690,7 +689,7 @@ body {
     border: 1px solid var(--card-border);
     border-radius: 10px;
     color: var(--text-white);
-    padding: 10px 16px;
+    padding: 7px 16px;
     font-size: 0.85rem;
     font-family: inherit;
     cursor: pointer;
@@ -725,7 +724,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 18px;
+    gap: 14px;
 }
 
 .btn-player-control {
