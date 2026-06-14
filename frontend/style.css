@@ -1260,3 +1260,65 @@ body {
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
 }
+
+/* --- EXTRA LARGE SCREENS (Desktop > 1400px) --- */
+@media (min-width: 1400px) {
+    .app-container {
+        max-width: 1600px;
+        padding: 20px 40px;
+        gap: 16px;
+    }
+    .timer-section {
+        min-height: 480px;
+        padding: 30px;
+    }
+    .timer-circle-container {
+        width: 380px;
+        height: 380px;
+    }
+    .timer-clock {
+        font-size: 6rem;
+    }
+    .timer-subject {
+        font-size: 1.4rem;
+        margin-bottom: 8px;
+    }
+    .timer-sublabel {
+        font-size: 1.2rem;
+    }
+    .timer-badge {
+        font-size: 1rem;
+        padding: 8px 24px;
+        margin-bottom: 24px;
+    }
+    .btn-control {
+        font-size: 1.15rem;
+        padding: 18px 36px;
+    }
+    .preset-btn {
+        padding: 18px 20px;
+    }
+    .preset-name {
+        font-size: 1.15rem;
+    }
+    .preset-time {
+        font-size: 0.95rem;
+    }
+    .card-title {
+        font-size: 1.1rem;
+        margin-bottom: 16px;
+    }
+    .youtube-player-container {
+        padding: 16px 24px;
+        margin-bottom: 16px;
+    }
+    .track-title {
+        font-size: 1.1rem;
+    }
+    .track-status {
+        font-size: 0.95rem;
+    }
+    .black-card {
+        padding: 24px 30px;
+    }
+}
