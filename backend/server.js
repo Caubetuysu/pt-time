@@ -96,6 +96,14 @@ const authenticateUser = async (req, res, next) => {
             console.error('Error verifying Firebase token:', error);
             req.user = { uid: 'guest' };
         }
+    } else if (token && token !== 'null') {
+        try {
+            // Decode JWT payload manually (for local db.json without admin credentials)
+            const payload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+            req.user = { uid: payload.user_id || payload.sub || 'guest' };
+        } catch (e) {
+            req.user = { uid: 'guest' };
+        }
     } else {
         req.user = { uid: 'guest' };
     }

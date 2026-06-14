@@ -9,9 +9,13 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
 let backendOffline = false;
 // --- Firebase Frontend Auth Configuration ---
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID"
+  apiKey: "AIzaSyCWLTaZ9t5CVbIufSq2C2fHa8G9LG064hk",
+  authDomain: "pt-time-4989f.firebaseapp.com",
+  projectId: "pt-time-4989f",
+  storageBucket: "pt-time-4989f.firebasestorage.app",
+  messagingSenderId: "738231566882",
+  appId: "1:738231566882:web:fef7a9fed0bf922651007b",
+  measurementId: "G-56N7G0TCDX"
 };
 // Initialize Firebase only if configured (placeholders replaced)
 let auth = null;
