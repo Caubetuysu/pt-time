@@ -63,6 +63,8 @@ const ytPrevBtn = document.getElementById('yt-prev-btn');
 const ytNextBtn = document.getElementById('yt-next-btn');
 const ytVolumeSlider = document.getElementById('yt-volume');
 const ytVolumePercent = document.getElementById('yt-volume-percent');
+const ytCustomLink = document.getElementById('yt-custom-link');
+const btnAddYt = document.getElementById('btn-add-yt');
 
 const rainToggle = document.getElementById('rain-toggle');
 const rainVolumeSlider = document.getElementById('rain-volume');
@@ -208,6 +210,7 @@ function initEventListeners() {
     ytPrevBtn.addEventListener('click', playPrevYt);
     ytNextBtn.addEventListener('click', playNextYt);
     playlistSelect.addEventListener('change', loadSelectedPlaylist);
+    if (btnAddYt) btnAddYt.addEventListener('click', addCustomYtVideo);
     ytVolumeSlider.addEventListener('input', (e) => {
         const val = e.target.value;
         ytVolumePercent.textContent = `${val}%`;
@@ -682,6 +685,36 @@ function toggleYtPlay() {
     } catch(e) {
         alert("Lỗi khi lấy state: " + e.message);
     }
+}
+
+function extractYouTubeId(url) {
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : (url.length === 11 ? url : null);
+}
+
+function addCustomYtVideo() {
+    if (!ytCustomLink) return;
+    const link = ytCustomLink.value.trim();
+    if (!link) return;
+    
+    const videoId = extractYouTubeId(link);
+    if (!videoId) {
+        alert("Link YouTube không hợp lệ! Vui lòng dán link hoặc ID hợp lệ.");
+        return;
+    }
+    
+    playlists.push({ type: 'video', id: videoId, title: 'Nhạc tùy chỉnh' });
+    const newIndex = playlists.length - 1;
+    
+    const option = document.createElement('option');
+    option.value = newIndex;
+    option.textContent = 'Nhạc tùy chỉnh (' + videoId + ')';
+    playlistSelect.appendChild(option);
+    
+    playlistSelect.value = newIndex;
+    ytCustomLink.value = '';
+    loadSelectedPlaylist();
 }
 
 function loadSelectedPlaylist() {
