@@ -1339,36 +1339,37 @@ body.is-fullscreen-timer .btn-fullscreen {
 /* --- EXTRA LARGE SCREENS (Desktop > 1024px) --- */
 @media (min-width: 1024px) {
     .app-container {
-        max-width: 1300px;
-        padding: 12px 20px;
-        gap: 12px;
+        max-width: 1280px;
+        padding: 10px 20px;
+        gap: 10px;
     }
     .timer-section {
-        min-height: 400px;
-        padding: 20px;
+        min-height: 380px;
+        padding: 16px 20px;
     }
     .timer-circle-container {
-        width: 340px;
-        height: 340px;
+        width: 320px;
+        height: 320px;
+        margin-bottom: 12px;
     }
     .timer-clock {
-        font-size: 4.8rem;
+        font-size: 4.5rem;
     }
     .timer-subject {
-        font-size: 1.2rem;
-        margin-bottom: 6px;
+        font-size: 1.15rem;
+        margin-bottom: 4px;
     }
     .timer-sublabel {
-        font-size: 1.05rem;
+        font-size: 1rem;
     }
     .timer-badge {
-        font-size: 0.95rem;
-        padding: 6px 20px;
-        margin-bottom: 16px;
+        font-size: 0.9rem;
+        padding: 6px 16px;
+        margin-bottom: 12px;
     }
     .btn-control {
         font-size: 1.05rem;
-        padding: 16px 32px;
+        padding: 14px 28px;
     }
     .preset-btn {
         padding: 14px 16px;
