@@ -580,6 +580,12 @@ function resumeAudioContexts() {
 }
 
 // --- YouTube IFrame API Control ---
+// Dynamically load the YouTube IFrame Player API code asynchronously.
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
 window.onYouTubeIframeAPIReady = function() {
     ytPlayer = new YT.Player('youtube-player', {
         height: '180',
