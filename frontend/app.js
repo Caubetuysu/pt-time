@@ -422,7 +422,6 @@ function startTimer() {
     playPauseText.textContent = 'Tạm dừng';
     
     updateControlBtnStyles();
-    timerCircleProgress.classList.add('running-pulse');
     
     // Accurate Timer loop (compensated for background tab delays)
     timerInterval = setInterval(() => {
@@ -452,7 +451,6 @@ function pauseTimer() {
     playPauseText.textContent = 'Tiếp tục';
     
     updateControlBtnStyles();
-    timerCircleProgress.classList.remove('running-pulse');
     timerSublabel.textContent = 'Đã tạm dừng';
 }
 

@@ -370,16 +370,6 @@ body {
     transition: stroke-dashoffset 1s linear, stroke 0.4s ease;
 }
 
-@keyframes pulse-ring {
-    0% { filter: drop-shadow(0 0 2px currentColor); }
-    50% { filter: drop-shadow(0 0 15px currentColor); }
-    100% { filter: drop-shadow(0 0 2px currentColor); }
-}
-
-.timer-circle-fg.running-pulse {
-    animation: pulse-ring 2s infinite ease-in-out;
-}
-
 .timer-display-wrapper {
     display: flex;
     flex-direction: column;
