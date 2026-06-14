@@ -13,7 +13,7 @@ const playlists = [
     { type: 'live', id: 'jfKfPfyJRdk', title: 'Lofi Girl Live Radio' },
     { type: 'live', id: '7NOSDKb0HGQ', title: 'Chillhop Live Radio' },
     { type: 'live', id: '4xDzrIxqM1k', title: 'Synthwave / Code Focus' },
-    { type: 'playlist', id: 'PL3oW2tjiIxvSpY1Y7F65t254yqPzN3Rz3', title: 'Synthwave Study Session' }
+    { type: 'live', id: 'lTRiuFIKP54', title: '1 A.M Study Session' }
 ];
 
 // --- Application State ---
