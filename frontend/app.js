@@ -663,15 +663,13 @@ function toggleYtPlay() {
     resumeAudioContexts();
     if (!ytPlayerReady || !ytPlayer) return;
     
-    try {
-        const state = ytPlayer.getPlayerState();
-        if (state === YT.PlayerState.PLAYING) {
-            ytPlayer.pauseVideo();
-        } else {
-            ytPlayer.playVideo();
-        }
-    } catch(e) {
-        loadSelectedPlaylist();
+    if (typeof ytPlayer.getPlayerState !== 'function') return;
+
+    const state = ytPlayer.getPlayerState();
+    if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
+        ytPlayer.pauseVideo();
+    } else {
+        ytPlayer.playVideo();
     }
 }
 
