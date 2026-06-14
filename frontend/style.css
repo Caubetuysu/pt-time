@@ -105,10 +105,10 @@ body {
 .app-container {
     width: 100%;
     max-width: 1200px;
-    padding: 12px 20px;
+    padding: 8px 20px;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 6px;
     min-height: 100vh;
     justify-content: flex-start;
     margin: 0 auto;
@@ -142,12 +142,13 @@ body {
 
 /* --- Subject Selector --- */
 .subject-selector-container {
-    flex: 1;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 12px;
     position: relative;
+    margin-top: 4px;
+    margin-bottom: 4px;
 }
 
 .custom-select-wrapper {
@@ -301,12 +302,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 20px 24px;
-    min-height: 380px;
+    padding: 16px 20px;
+    min-height: 340px;
 }
 
 .timer-badge-container {
-    margin-bottom: 30px;
+    margin-bottom: 16px;
 }
 
 .timer-badge {
@@ -495,7 +496,7 @@ body {
     background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--card-border);
     border-radius: 14px;
-    padding: 14px;
+    padding: 10px 12px;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
