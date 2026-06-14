@@ -1261,6 +1261,81 @@ body {
     box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
 }
 
+/* --- FULLSCREEN FOCUS MODE --- */
+.btn-fullscreen {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: var(--transition-quick);
+    padding: 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.btn-fullscreen:hover {
+    color: var(--text-white);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+body.is-fullscreen-timer {
+    overflow: hidden;
+}
+
+body.is-fullscreen-timer .timer-section {
+    position: fixed !important;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    z-index: 99999;
+    background: #000;
+    border-radius: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+}
+
+body.is-fullscreen-timer .timer-circle-container {
+    width: 450px !important;
+    height: 450px !important;
+    margin-bottom: 40px !important;
+}
+
+body.is-fullscreen-timer .timer-clock {
+    font-size: 7.5rem !important;
+}
+
+body.is-fullscreen-timer .timer-subject {
+    font-size: 1.8rem !important;
+    margin-bottom: 12px !important;
+}
+
+body.is-fullscreen-timer .timer-sublabel {
+    font-size: 1.4rem !important;
+}
+
+body.is-fullscreen-timer .timer-badge {
+    font-size: 1.2rem !important;
+    padding: 10px 28px !important;
+    margin-bottom: 40px !important;
+}
+
+body.is-fullscreen-timer .btn-control {
+    font-size: 1.3rem !important;
+    padding: 20px 48px !important;
+}
+
+body.is-fullscreen-timer .btn-fullscreen {
+    top: 30px;
+    right: 30px;
+    transform: scale(1.3);
+}
+
 /* --- EXTRA LARGE SCREENS (Desktop > 1024px) --- */
 @media (min-width: 1024px) {
     .app-container {
@@ -1273,11 +1348,11 @@ body {
         padding: 20px;
     }
     .timer-circle-container {
-        width: 300px;
-        height: 300px;
+        width: 340px;
+        height: 340px;
     }
     .timer-clock {
-        font-size: 5rem;
+        font-size: 4.8rem;
     }
     .timer-subject {
         font-size: 1.2rem;

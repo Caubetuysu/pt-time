@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.0.14">
+    <link rel="stylesheet" href="style.css?v=1.0.15">
 </head>
 <body>
     <!-- Background grid overlay -->
@@ -83,7 +83,14 @@
             <main class="main-content">
                 <!-- Left Side: Cinematic Timer View -->
                 <section class="timer-section black-card" aria-labelledby="timer-heading">
-                    <h2 id="timer-heading" class="sr-only">Bộ đếm thời gian</h2>
+                    <!-- Fullscreen Button -->
+                    <button id="fullscreen-btn" class="btn-fullscreen" aria-label="Phóng to" title="Phóng to (Fullscreen)">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
+                        </svg>
+                    </button>
+
+                    <h2 id="timer-heading" class="sr-only">Đồng hồ đếm ngược</h2>
                     
                     <!-- Focus State Badge -->
                     <div class="timer-badge-container">
@@ -331,7 +338,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
-    <!-- Youtube IFrame Player API script will be loaded dynamically by app.js -->
-    <script src="app.js?v=1.0.3"></script>
+    <!-- Application Scripts -->
+    <script src="app.js?v=1.0.5"></script>
 </body>
 </html>
