@@ -1261,11 +1261,15 @@ body {
     box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* --- FULLSCREEN FOCUS MODE --- */
-.btn-fullscreen {
+/* --- FULLSCREEN & TOP ACTIONS --- */
+.timer-top-actions {
     position: absolute;
     top: 16px;
     right: 16px;
+    display: flex;
+    gap: 8px;
+}
+.btn-fullscreen {
     background: transparent;
     border: none;
     color: var(--text-muted);
@@ -1330,10 +1334,90 @@ body.is-fullscreen-timer .btn-control {
     padding: 20px 48px !important;
 }
 
-body.is-fullscreen-timer .btn-fullscreen {
+body.is-fullscreen-timer .timer-top-actions {
     top: 30px;
     right: 30px;
+    gap: 16px;
+}
+body.is-fullscreen-timer .btn-fullscreen {
     transform: scale(1.3);
+}
+
+/* --- FLIP CLOCK STYLES --- */
+.flip-clock-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 30px;
+}
+.flip-group {
+    display: flex;
+    flex-direction: column;
+}
+.flip-card {
+    background: #18181b;
+    border-radius: 16px;
+    padding: 20px;
+    color: #fff;
+    font-size: 6rem;
+    font-weight: 700;
+    font-family: monospace, sans-serif;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.15);
+    width: 140px;
+    text-align: center;
+    overflow: hidden;
+}
+.flip-card-inner {
+    position: relative;
+    z-index: 2;
+    transition: transform 0.1s;
+}
+/* Đường chẻ giữa thẻ số */
+.flip-card-divider {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(0,0,0,0.8);
+    transform: translateY(-50%);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.2);
+    z-index: 3;
+}
+.flip-colon {
+    font-size: 5rem;
+    color: var(--text-white);
+    padding-bottom: 20px;
+    animation: pulse-opacity 1.5s infinite;
+}
+
+@keyframes pulse-opacity {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+}
+
+/* Flip Animation class triggered by JS */
+.flip-animate .flip-card-inner {
+    animation: flip-flop 0.5s ease-out forwards;
+}
+
+@keyframes flip-flop {
+    0% { transform: scaleY(1); opacity: 1; }
+    30% { transform: scaleY(0.7); opacity: 0.8; }
+    100% { transform: scaleY(1); opacity: 1; }
+}
+
+/* Make flip clock bigger in fullscreen */
+body.is-fullscreen-timer .flip-card {
+    width: 200px;
+    font-size: 9rem;
+    padding: 30px 20px;
+}
+body.is-fullscreen-timer .flip-colon {
+    font-size: 8rem;
 }
 
 /* --- EXTRA LARGE SCREENS (Desktop > 1024px) --- */

@@ -41,6 +41,9 @@ let timerState = 'idle'; // 'idle', 'running', 'paused'
 let timerMode = 'focus'; // 'focus', 'break', 'ielts'
 let selectedSubject = 'Chưa chọn';
 
+// View Style
+let currentClockStyle = localStorage.getItem('zentime_clock_style') || 'circle'; // 'circle' or 'flip'
+
 // Timer drift correction variables
 let timerInterval = null;
 let startTime = null;
@@ -158,6 +161,26 @@ function renderSubjectDropdown(subjects) {
 // --- Timer UI Setup ---
 function initTimerUI() {
     updateTimerDisplay();
+    applyClockStyle();
+}
+
+function toggleClockStyle() {
+    currentClockStyle = currentClockStyle === 'circle' ? 'flip' : 'circle';
+    localStorage.setItem('zentime_clock_style', currentClockStyle);
+    applyClockStyle();
+}
+
+function applyClockStyle() {
+    const circleView = document.querySelector('.timer-circle-container');
+    const flipView = document.getElementById('flip-clock-view');
+    
+    if (currentClockStyle === 'circle') {
+        circleView.classList.remove('hidden');
+        flipView.classList.add('hidden');
+    } else {
+        circleView.classList.add('hidden');
+        flipView.classList.remove('hidden');
+    }
 }
 
 function updateTimerDisplay() {
@@ -167,7 +190,30 @@ function updateTimerDisplay() {
     // Format timer clocks: mm:ss
     const formattedMinutes = String(minutes).padStart(2, '0');
     const formattedSeconds = String(seconds).padStart(2, '0');
+    
+    // Circle Clock Update
     timerClock.textContent = `${formattedMinutes}:${formattedSeconds}`;
+    
+    // Flip Clock Update
+    const flipMinEl = document.getElementById('flip-min');
+    const flipSecEl = document.getElementById('flip-sec');
+    
+    if (flipMinEl && flipMinEl.textContent !== formattedMinutes) {
+        flipMinEl.textContent = formattedMinutes;
+        // Trigger animation
+        const flipGroup = flipMinEl.closest('.flip-group');
+        flipGroup.classList.remove('flip-animate');
+        void flipGroup.offsetWidth; // Force reflow
+        flipGroup.classList.add('flip-animate');
+    }
+    if (flipSecEl && flipSecEl.textContent !== formattedSeconds) {
+        flipSecEl.textContent = formattedSeconds;
+        // Trigger animation
+        const flipGroup = flipSecEl.closest('.flip-group');
+        flipGroup.classList.remove('flip-animate');
+        void flipGroup.offsetWidth; // Force reflow
+        flipGroup.classList.add('flip-animate');
+    }
     
     // Document Title Update for background tracking
     const modeIndicator = timerMode === 'focus' ? '🎯' : (timerMode === 'ielts' ? '🗣️' : '☕');
@@ -249,6 +295,12 @@ function initEventListeners() {
                 }
             }
         });
+    }
+
+    // Toggle Clock Style
+    const toggleClockBtn = document.getElementById('toggle-clock-btn');
+    if (toggleClockBtn) {
+        toggleClockBtn.addEventListener('click', toggleClockStyle);
     }
 
     document.addEventListener('fullscreenchange', () => {
