@@ -10,10 +10,7 @@ let backendOffline = false;
 
 // --- Global Playlists Configuration ---
 const playlists = [
-    { type: 'video', id: 'lTRiuFIKP54', title: 'Lofi Girl - 1 A.M Study Session' },
-    { type: 'video', id: '-5KAN9_CzSA', title: 'Lofi Girl - 2 A.M Study Session' },
-    { type: 'video', id: 'DWcJFNfaw9c', title: 'Chillhop - Beats to Relax/Study' },
-    { type: 'video', id: '1fueZCTYkpA', title: 'Star Wars Lofi Hip Hop' }
+    { type: 'video', id: 'lTRiuFIKP54', title: 'Lofi Girl - Morning Coffee' }
 ];
 
 // --- Application State ---
