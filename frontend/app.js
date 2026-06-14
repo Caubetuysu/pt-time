@@ -661,15 +661,26 @@ function onPlayerError(event) {
 
 function toggleYtPlay() {
     resumeAudioContexts();
-    if (!ytPlayerReady || !ytPlayer) return;
+    if (!ytPlayerReady || !ytPlayer) {
+        alert("Player chưa sẵn sàng! Vui lòng đợi 1-2 giây.");
+        return;
+    }
     
-    if (typeof ytPlayer.getPlayerState !== 'function') return;
+    if (typeof ytPlayer.getPlayerState !== 'function') {
+        alert("API Youtube chưa load xong các hàm.");
+        return;
+    }
 
-    const state = ytPlayer.getPlayerState();
-    if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
-        ytPlayer.pauseVideo();
-    } else {
-        ytPlayer.playVideo();
+    try {
+        const state = ytPlayer.getPlayerState();
+        if (state === YT.PlayerState.PLAYING || state === YT.PlayerState.BUFFERING) {
+            ytPlayer.pauseVideo();
+        } else {
+            ytPlayer.playVideo();
+            // Optional debug alert if still failing: alert("Đã gửi lệnh playVideo. State cũ: " + state);
+        }
+    } catch(e) {
+        alert("Lỗi khi lấy state: " + e.message);
     }
 }
 

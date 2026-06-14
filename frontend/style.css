@@ -601,13 +601,14 @@ body {
 
 /* Hidden YouTube component box but needs sizes for APIs to work */
 #youtube-player {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    opacity: 0.001;
-    z-index: 9999;
+    position: absolute;
+    width: 240px;
+    height: 180px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.1;
+    z-index: 0;
     pointer-events: none;
 }
 
@@ -616,6 +617,8 @@ body {
     align-items: center;
     gap: 14px;
     width: 100%;
+    position: relative;
+    z-index: 10;
 }
 
 .vinyl-record {
@@ -676,6 +679,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    position: relative;
+    z-index: 10;
 }
 
 .playlist-select {
