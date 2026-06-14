@@ -689,6 +689,10 @@ function loadSelectedPlaylist() {
             index: 0
         });
     }
+    
+    try {
+        ytPlayer.playVideo();
+    } catch(e) {}
 }
 
 function playNextYt() {
