@@ -19,12 +19,12 @@
     <div class="app-container">
         <!-- HEADER -->
         <header class="app-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 20px;">
-            <div style="display: flex; gap: 20px; align-items: center;">
-                <div class="logo">
-                    PT <span class="logo-accent">Time</span>
-                </div>
+            <div class="logo" style="flex: 1; margin-bottom: 0;">
+                PT <span class="logo-accent">Time</span>
+            </div>
 
-                <!-- PILL NAVIGATION -->
+            <!-- PILL NAVIGATION -->
+            <div style="flex: 1; display: flex; justify-content: center;">
                 <nav class="nav-pill-container" aria-label="Đầu mục chuyển trang">
                     <button type="button" class="nav-tab-item active" data-tab="timer" aria-current="page">
                         <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
@@ -41,7 +41,7 @@
                 </nav>
             </div>
             
-            <div id="auth-section" style="display: flex; align-items: center; gap: 10px;">
+            <div id="auth-section" style="display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex: 1;">
                 <button type="button" id="btn-login" class="btn-apply-preset" style="padding: 6px 16px;">Đăng nhập Google</button>
                 <div id="user-profile" style="display: none; align-items: center; gap: 10px;">
                     <img id="user-avatar" src="" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
