@@ -624,7 +624,7 @@ window.onYouTubeIframeAPIReady = function() {
         height: '180',
         width: '240',
         videoId: playlists[0].id,
-        host: 'https://www.youtube.com',
+        host: 'https://www.youtube-nocookie.com',
         playerVars: {
             autoplay: 0,
             controls: 0,
