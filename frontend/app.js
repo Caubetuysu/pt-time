@@ -9,7 +9,7 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
 let backendOffline = false;
 // --- Firebase Frontend Auth Configuration ---
 const firebaseConfig = {
-  apiKey: "AIzaSyCWLTaZ9t5CVbIufSq2C2fHa8G9LG064hk",
+  apiKey: "AIzaSyCWlTaZ9t5CVbIufSq2C2fHa8G9LG064hk",
   authDomain: "pt-time-4989f.firebaseapp.com",
   projectId: "pt-time-4989f",
   storageBucket: "pt-time-4989f.firebasestorage.app",
