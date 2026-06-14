@@ -601,13 +601,14 @@ body {
 
 /* Hidden YouTube component box but needs sizes for APIs to work */
 #youtube-player {
-    position: absolute;
-    width: 300px;
-    height: 300px;
-    top: -9999px;
-    left: -9999px;
-    opacity: 1;
-    z-index: -1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    opacity: 0.001;
+    z-index: 9999;
+    pointer-events: none;
 }
 
 .player-overlay {
