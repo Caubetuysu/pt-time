@@ -10,10 +10,10 @@ let backendOffline = false;
 
 // --- Global Playlists Configuration ---
 const playlists = [
-    { type: 'live', id: 'jfKfPfyJRdk', title: 'Lofi Girl Live Radio' },
-    { type: 'live', id: '7NOSDKb0HGQ', title: 'Chillhop Live Radio' },
-    { type: 'live', id: '4xDzrIxqM1k', title: 'Synthwave / Code Focus' },
-    { type: 'live', id: 'lTRiuFIKP54', title: '1 A.M Study Session' }
+    { type: 'video', id: 'lTRiuFIKP54', title: 'Lofi Girl - 1 A.M Study Session' },
+    { type: 'video', id: '-5KAN9_CzSA', title: 'Lofi Girl - 2 A.M Study Session' },
+    { type: 'video', id: 'DWcJFNfaw9c', title: 'Chillhop - Beats to Relax/Study' },
+    { type: 'video', id: '1fueZCTYkpA', title: 'Star Wars Lofi Hip Hop' }
 ];
 
 // --- Application State ---
@@ -694,7 +694,7 @@ function loadSelectedPlaylist() {
     document.getElementById('current-track-title').innerText = item.title;
     document.getElementById('current-track-status').innerText = 'Đang tải luồng...';
     
-    if (item.type === 'live') {
+    if (item.type === 'live' || item.type === 'video') {
         ytPlayer.loadVideoById(item.id);
     } else {
         ytPlayer.loadPlaylist({
