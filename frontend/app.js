@@ -31,7 +31,7 @@ if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
 
 // --- Global Playlists Configuration ---
 const playlists = [
-    { type: 'video', id: 'lTRiuFIKP54', title: 'Lofi Girl - Morning Coffee' }
+    { type: 'video', id: 'n61ULEU7CO0', title: 'Lofi Girl - Chill Lofi Beats' }
 ];
 
 // --- Application State ---
