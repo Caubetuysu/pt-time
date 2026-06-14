@@ -877,7 +877,7 @@ function renderChart(sessions) {
         
         // Accent color customization based on subject or just neon cyan
         if (subject === 'IELTS') {
-            barFill.style.background = 'linear-gradient(90deg, #00F2FE, #FF2E93)';
+            barFill.style.background = 'linear-gradient(90deg, #3A86FF, #3A86FF)';
         }
         
         barContainer.appendChild(barFill);
