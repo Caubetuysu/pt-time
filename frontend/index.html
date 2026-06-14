@@ -18,26 +18,38 @@
 
     <div class="app-container">
         <!-- HEADER -->
-        <header class="app-header">
-            <div class="logo">
-                PT <span class="logo-accent">Time</span>
-            </div>
+        <header class="app-header" style="display: flex; justify-content: space-between; align-items: center; padding-right: 20px;">
+            <div style="display: flex; gap: 20px; align-items: center;">
+                <div class="logo">
+                    PT <span class="logo-accent">Time</span>
+                </div>
 
-            <!-- PILL NAVIGATION -->
-            <nav class="nav-pill-container" aria-label="Đầu mục chuyển trang">
-                <button type="button" class="nav-tab-item active" data-tab="timer" aria-current="page">
-                    <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                    Đồng Hồ
-                </button>
-                <button type="button" class="nav-tab-item" data-tab="sound">
-                    <svg viewBox="0 0 24 24" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
-                    Âm Thanh
-                </button>
-                <button type="button" class="nav-tab-item" data-tab="stats">
-                    <svg viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                    Thống Kê
-                </button>
-            </nav>
+                <!-- PILL NAVIGATION -->
+                <nav class="nav-pill-container" aria-label="Đầu mục chuyển trang">
+                    <button type="button" class="nav-tab-item active" data-tab="timer" aria-current="page">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Đồng Hồ
+                    </button>
+                    <button type="button" class="nav-tab-item" data-tab="sound">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><path d="M9 18V5l12-2v13"></path><circle cx="6" cy="18" r="3"></circle><circle cx="18" cy="16" r="3"></circle></svg>
+                        Âm Thanh
+                    </button>
+                    <button type="button" class="nav-tab-item" data-tab="stats">
+                        <svg viewBox="0 0 24 24" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                        Thống Kê
+                    </button>
+                </nav>
+            </div>
+            
+            <div id="auth-section" style="display: flex; align-items: center; gap: 10px;">
+                <button type="button" id="btn-login" class="btn-apply-preset" style="padding: 6px 16px;">Đăng nhập Google</button>
+                <div id="user-profile" style="display: none; align-items: center; gap: 10px;">
+                    <img id="user-avatar" src="" alt="Avatar" style="width: 30px; height: 30px; border-radius: 50%; object-fit: cover;">
+                    <span id="user-name" style="color: var(--text-muted); font-size: 0.9rem;"></span>
+                    <button type="button" id="btn-logout" style="background: none; border: none; color: var(--danger-color); cursor: pointer; font-size: 0.8rem;">Đăng xuất</button>
+                </div>
+            </div>
+        </header>
             
             <div class="subject-selector-container">
                 <label for="subject-select" class="sr-only">Chọn môn học</label>
@@ -296,6 +308,10 @@
 
     <!-- Hidden audio element for timer alarm bell using synthesis if preferred, but we use a synthesizer buzz anyway -->
     
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+
     <!-- Youtube IFrame Player API script will be loaded dynamically by app.js -->
     <script src="app.js"></script>
 </body>

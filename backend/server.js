@@ -79,18 +79,56 @@ function writeDB(data) {
     }
 }
 
+
+// --- Auth Middleware ---
+const authenticateUser = async (req, res, next) => {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+        req.user = { uid: 'guest' };
+        return next();
+    }
+    const token = authHeader.split('Bearer ')[1];
+    if (useFirebase && token) {
+        try {
+            const decodedToken = await admin.auth().verifyIdToken(token);
+            req.user = decodedToken;
+        } catch (error) {
+            console.error('Error verifying Firebase token:', error);
+            req.user = { uid: 'guest' };
+        }
+    } else {
+        req.user = { uid: 'guest' };
+    }
+    next();
+};
+
+app.use(authenticateUser);
+
+function getUserDB(db, uid) {
+    if (!db.users) db.users = {};
+    if (!db.users[uid]) {
+        db.users[uid] = {
+            subjects: ["Toán", "Văn", "Anh", "Code", "IELTS"],
+            sessions: [],
+            documents: [],
+            courses: []
+        };
+    }
+    return db.users[uid];
+}
+
 // API Endpoints
 
 // Get all subjects
 app.get('/api/subjects', async (req, res) => {
     if (useFirebase) {
         try {
-            const snapshot = await firestoreDb.collection('subjects').get();
+            const snapshot = await firestoreDb.collection('users').doc(req.user.uid).collection('subjects').get();
             if (snapshot.empty) {
                 const defaultNames = ["Toán", "Văn", "Anh", "Code", "IELTS"];
                 const batch = firestoreDb.batch();
                 defaultNames.forEach(name => {
-                    const docRef = firestoreDb.collection('subjects').doc(name);
+                    const docRef = firestoreDb.collection('users').doc(req.user.uid).collection('subjects').doc(name);
                     batch.set(docRef, { name });
                 });
                 await batch.commit();
@@ -107,7 +145,8 @@ app.get('/api/subjects', async (req, res) => {
         }
     } else {
         const db = readDB();
-        res.json(db.subjects);
+        const userDb = getUserDB(db, req.user.uid);
+        res.json(userDb.subjects);
     }
 });
 
@@ -122,14 +161,14 @@ app.post('/api/subjects', async (req, res) => {
     
     if (useFirebase) {
         try {
-            const docRef = firestoreDb.collection('subjects').doc(cleanSubject);
+            const docRef = firestoreDb.collection('users').doc(req.user.uid).collection('subjects').doc(cleanSubject);
             const doc = await docRef.get();
             if (doc.exists) {
                 return res.status(400).json({ error: 'Môn học đã tồn tại.' });
             }
             await docRef.set({ name: cleanSubject });
             
-            const snapshot = await firestoreDb.collection('subjects').get();
+            const snapshot = await firestoreDb.collection('users').doc(req.user.uid).collection('subjects').get();
             const subjects = [];
             snapshot.forEach(d => subjects.push(d.data().name));
             res.status(201).json(subjects);
@@ -139,12 +178,13 @@ app.post('/api/subjects', async (req, res) => {
         }
     } else {
         const db = readDB();
-        if (db.subjects.includes(cleanSubject)) {
+        const userDb = getUserDB(db, req.user.uid);
+        if (userDb.subjects.includes(cleanSubject)) {
             return res.status(400).json({ error: 'Môn học đã tồn tại.' });
         }
-        db.subjects.push(cleanSubject);
+        userDb.subjects.push(cleanSubject);
         if (writeDB(db)) {
-            res.status(201).json(db.subjects);
+            res.status(201).json(userDb.subjects);
         } else {
             res.status(500).json({ error: 'Không thể lưu môn học mới.' });
         }
@@ -155,7 +195,7 @@ app.post('/api/subjects', async (req, res) => {
 app.get('/api/sessions', async (req, res) => {
     if (useFirebase) {
         try {
-            const snapshot = await firestoreDb.collection('sessions')
+            const snapshot = await firestoreDb.collection('users').doc(req.user.uid).collection('sessions')
                 .orderBy('timestamp', 'desc')
                 .limit(100)
                 .get();
@@ -170,7 +210,8 @@ app.get('/api/sessions', async (req, res) => {
         }
     } else {
         const db = readDB();
-        res.json(db.sessions);
+        const userDb = getUserDB(db, req.user.uid);
+        res.json(userDb.sessions);
     }
 });
 
@@ -191,7 +232,7 @@ app.post('/api/sessions', async (req, res) => {
     
     if (useFirebase) {
         try {
-            await firestoreDb.collection('sessions').doc(newSession.id).set(newSession);
+            await firestoreDb.collection('users').doc(req.user.uid).collection('sessions').doc(newSession.id).set(newSession);
             res.status(201).json(newSession);
         } catch (error) {
             console.error('Error saving session to Firebase:', error);
@@ -199,7 +240,8 @@ app.post('/api/sessions', async (req, res) => {
         }
     } else {
         const db = readDB();
-        db.sessions.push(newSession);
+        const userDb = getUserDB(db, req.user.uid);
+        userDb.sessions.push(newSession);
         
         if (writeDB(db)) {
             res.status(201).json(newSession);
@@ -213,7 +255,7 @@ app.post('/api/sessions', async (req, res) => {
 app.delete('/api/sessions', async (req, res) => {
     if (useFirebase) {
         try {
-            const snapshot = await firestoreDb.collection('sessions').get();
+            const snapshot = await firestoreDb.collection('users').doc(req.user.uid).collection('sessions').get();
             const batch = firestoreDb.batch();
             snapshot.forEach(doc => {
                 batch.delete(doc.ref);
@@ -226,7 +268,8 @@ app.delete('/api/sessions', async (req, res) => {
         }
     } else {
         const db = readDB();
-        db.sessions = [];
+        const userDb = getUserDB(db, req.user.uid);
+        userDb.sessions = [];
         
         if (writeDB(db)) {
             res.json({ message: 'Đã xóa toàn bộ lịch sử thành công.' });
@@ -240,7 +283,7 @@ app.delete('/api/sessions', async (req, res) => {
 app.get('/api/documents', async (req, res) => {
     if (useFirebase) {
         try {
-            const snapshot = await firestoreDb.collection('documents').get();
+            const snapshot = await firestoreDb.collection('users').doc(req.user.uid).collection('documents').get();
             const docs = [];
             snapshot.forEach(doc => {
                 docs.push(doc.data());
@@ -252,7 +295,8 @@ app.get('/api/documents', async (req, res) => {
         }
     } else {
         const db = readDB();
-        res.json(db.documents || []);
+        const userDb = getUserDB(db, req.user.uid);
+        res.json(userDb.documents || []);
     }
 });
 
@@ -272,7 +316,7 @@ app.post('/api/documents', async (req, res) => {
     
     if (useFirebase) {
         try {
-            await firestoreDb.collection('documents').doc(newDoc.id).set(newDoc);
+            await firestoreDb.collection('users').doc(req.user.uid).collection('documents').doc(newDoc.id).set(newDoc);
             res.status(201).json(newDoc);
         } catch (error) {
             console.error('Error saving document to Firebase:', error);
@@ -280,8 +324,9 @@ app.post('/api/documents', async (req, res) => {
         }
     } else {
         const db = readDB();
-        if (!db.documents) db.documents = [];
-        db.documents.push(newDoc);
+        const userDb = getUserDB(db, req.user.uid);
+        if (!userDb.documents) userDb.documents = [];
+        userDb.documents.push(newDoc);
         if (writeDB(db)) {
             res.status(201).json(newDoc);
         } else {
@@ -294,7 +339,7 @@ app.post('/api/documents', async (req, res) => {
 app.get('/api/courses', async (req, res) => {
     if (useFirebase) {
         try {
-            const snapshot = await firestoreDb.collection('courses').get();
+            const snapshot = await firestoreDb.collection('users').doc(req.user.uid).collection('courses').get();
             const courses = [];
             snapshot.forEach(doc => {
                 courses.push(doc.data());
@@ -306,7 +351,8 @@ app.get('/api/courses', async (req, res) => {
         }
     } else {
         const db = readDB();
-        res.json(db.courses || []);
+        const userDb = getUserDB(db, req.user.uid);
+        res.json(userDb.courses || []);
     }
 });
 
@@ -329,7 +375,7 @@ app.post('/api/courses', async (req, res) => {
     
     if (useFirebase) {
         try {
-            await firestoreDb.collection('courses').doc(newCourse.id).set(newCourse);
+            await firestoreDb.collection('users').doc(req.user.uid).collection('courses').doc(newCourse.id).set(newCourse);
             res.status(201).json(newCourse);
         } catch (error) {
             console.error('Error saving course to Firebase:', error);
@@ -337,8 +383,9 @@ app.post('/api/courses', async (req, res) => {
         }
     } else {
         const db = readDB();
-        if (!db.courses) db.courses = [];
-        db.courses.push(newCourse);
+        const userDb = getUserDB(db, req.user.uid);
+        if (!userDb.courses) userDb.courses = [];
+        userDb.courses.push(newCourse);
         if (writeDB(db)) {
             res.status(201).json(newCourse);
         } else {
@@ -355,7 +402,7 @@ app.post('/api/courses/progress', async (req, res) => {
     
     if (useFirebase) {
         try {
-            const docRef = firestoreDb.collection('courses').doc(id);
+            const docRef = firestoreDb.collection('users').doc(req.user.uid).collection('courses').doc(id);
             const doc = await docRef.get();
             if (!doc.exists) {
                 return res.status(404).json({ error: 'Không tìm thấy khóa học.' });
@@ -374,17 +421,18 @@ app.post('/api/courses/progress', async (req, res) => {
         }
     } else {
         const db = readDB();
-        if (!db.courses) db.courses = [];
-        const index = db.courses.findIndex(c => c.id === id);
+        const userDb = getUserDB(db, req.user.uid);
+        if (!userDb.courses) userDb.courses = [];
+        const index = userDb.courses.findIndex(c => c.id === id);
         if (index === -1) {
             return res.status(404).json({ error: 'Không tìm thấy khóa học.' });
         }
         
-        db.courses[index].completedVideos = completedVideos || [];
-        db.courses[index].currentVideoIndex = parseInt(currentVideoIndex) || 0;
+        userDb.courses[index].completedVideos = completedVideos || [];
+        userDb.courses[index].currentVideoIndex = parseInt(currentVideoIndex) || 0;
         
         if (writeDB(db)) {
-            res.json(db.courses[index]);
+            res.json(userDb.courses[index]);
         } else {
             res.status(500).json({ error: 'Không thể cập nhật tiến độ học.' });
         }

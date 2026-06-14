@@ -7,6 +7,23 @@ const API_BASE_URL = window.location.hostname === 'localhost' || window.location
     ? 'http://localhost:5000/api'
     : '/api';
 let backendOffline = false;
+// --- Firebase Frontend Auth Configuration ---
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_AUTH_DOMAIN",
+    projectId: "YOUR_PROJECT_ID"
+};
+// Initialize Firebase only if configured (placeholders replaced)
+let auth = null;
+let provider = null;
+let currentUser = null;
+let idToken = null;
+
+if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
+    firebase.initializeApp(firebaseConfig);
+    auth = firebase.auth();
+    provider = new firebase.auth.GoogleAuthProvider();
+}
 
 // --- Global Playlists Configuration ---
 const playlists = [
@@ -79,6 +96,7 @@ const CIRCLE_CIRCUMFERENCE = 597;
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
+    initAuthUI();
     initCustomPlaylists();
     initSubjects();
     initTimerUI();
@@ -90,7 +108,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // --- Subject Management ---
 async function initSubjects() {
     try {
-        const response = await fetch(`${API_BASE_URL}/subjects`);
+        const headers = {};
+        if (idToken) headers['Authorization'] = `Bearer ${idToken}`;
+        
+        const response = await fetch(`${API_BASE_URL}/subjects`, { headers });
         if (!response.ok) throw new Error('Backend response not OK');
         const subjects = await response.json();
         
@@ -240,8 +261,11 @@ function initEventListeners() {
         if (confirm('Bạn có chắc chắn muốn xóa toàn bộ lịch sử phiên học?')) {
             if (!backendOffline) {
                 try {
+                    const headers = {};
+                    if (idToken) headers['Authorization'] = `Bearer ${idToken}`;
                     const response = await fetch(`${API_BASE_URL}/sessions`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers
                     });
                     if (!response.ok) throw new Error('Could not delete sessions on server');
                     updateDashboard();
@@ -265,9 +289,12 @@ async function saveCustomSubject() {
     
     if (!backendOffline) {
         try {
+            const headers = { 'Content-Type': 'application/json' };
+            if (idToken) headers['Authorization'] = `Bearer ${idToken}`;
+            
             const response = await fetch(`${API_BASE_URL}/subjects`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({ subject: val })
             });
             if (!response.ok) {
@@ -687,7 +714,8 @@ function toggleYtPlay() {
 }
 
 function initCustomPlaylists() {
-    const saved = localStorage.getItem('zentime_custom_playlists');
+    const userId = currentUser ? currentUser.uid : 'guest';
+    const saved = localStorage.getItem('zentime_custom_playlists_' + userId);
     if (saved) {
         try {
             const customArr = JSON.parse(saved);
@@ -733,10 +761,11 @@ function addCustomYtVideo() {
     playlistSelect.appendChild(option);
     
     try {
-        const saved = localStorage.getItem('zentime_custom_playlists');
+        const userId = currentUser ? currentUser.uid : 'guest';
+        const saved = localStorage.getItem('zentime_custom_playlists_' + userId);
         const customArr = saved ? JSON.parse(saved) : [];
         customArr.push(newItem);
-        localStorage.setItem('zentime_custom_playlists', JSON.stringify(customArr));
+        localStorage.setItem('zentime_custom_playlists_' + userId, JSON.stringify(customArr));
     } catch(e) {
         console.error('Lỗi khi lưu playlist', e);
     }
@@ -829,12 +858,16 @@ async function logSession() {
     
     if (!backendOffline) {
         try {
-            const response = await fetch(`${API_BASE_URL}/sessions`, {
+            const headers = { 'Content-Type': 'application/json' };
+            if (idToken) headers['Authorization'] = `Bearer ${idToken}`;
+
+            fetch(`${API_BASE_URL}/sessions`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify(newLog)
-            });
-            if (!response.ok) throw new Error('API server failed to save session log');
+            })
+            .then(res => { if(!res.ok) throw new Error('Network response was not ok'); })
+            .catch(err => console.error('Error syncing session:', err));
             updateDashboard();
             return;
         } catch (error) {
@@ -856,7 +889,9 @@ async function updateDashboard() {
     
     if (!backendOffline) {
         try {
-            const response = await fetch(`${API_BASE_URL}/sessions`);
+            const headers = {};
+            if (idToken) headers['Authorization'] = `Bearer ${idToken}`;
+            const response = await fetch(`${API_BASE_URL}/sessions`, { headers });
             if (!response.ok) throw new Error('API server response not OK');
             history = await response.json();
             
@@ -1057,4 +1092,64 @@ function initTabs() {
             });
         });
     });
+}
+
+// --- Firebase Auth UI & Handlers ---
+function initAuthUI() {
+    const btnLogin = document.getElementById('btn-login');
+    const btnLogout = document.getElementById('btn-logout');
+    
+    if (btnLogin) btnLogin.addEventListener('click', signInWithGoogle);
+    if (btnLogout) btnLogout.addEventListener('click', signOutUser);
+
+    if (auth) {
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            if (user) {
+                idToken = await user.getIdToken();
+                document.getElementById('btn-login').style.display = 'none';
+                document.getElementById('user-profile').style.display = 'flex';
+                document.getElementById('user-avatar').src = user.photoURL;
+                document.getElementById('user-name').innerText = user.displayName;
+                
+                // Refresh data for the logged in user
+                initSubjects();
+                updateDashboard();
+                
+                // Refresh playlists
+                playlists.length = 1; // Keep only Morning Coffee
+                playlistSelect.innerHTML = '<option value="0">Lofi Girl - Morning Coffee</option>';
+                initCustomPlaylists();
+            } else {
+                idToken = null;
+                document.getElementById('btn-login').style.display = 'block';
+                document.getElementById('user-profile').style.display = 'none';
+                
+                // Refresh data for guest
+                initSubjects();
+                updateDashboard();
+                
+                playlists.length = 1; // Keep only Morning Coffee
+                playlistSelect.innerHTML = '<option value="0">Lofi Girl - Morning Coffee</option>';
+                initCustomPlaylists();
+            }
+        });
+    }
+}
+
+function signInWithGoogle() {
+    if (!auth) {
+        alert("Tính năng đăng nhập yêu cầu bạn phải cấu hình Firebase Config trong app.js trước (dòng 12)!");
+        return;
+    }
+    auth.signInWithPopup(provider).catch(err => {
+        console.error("Lỗi đăng nhập:", err);
+        alert("Lỗi đăng nhập: " + err.message);
+    });
+}
+
+function signOutUser() {
+    if (auth) {
+        auth.signOut();
+    }
 }
