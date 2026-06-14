@@ -178,8 +178,27 @@ function updateTimerDisplay() {
     timerCircleProgress.style.strokeDashoffset = progressOffset;
 }
 
+// --- Custom Modal Override ---
+window.alert = function(message) {
+    const modal = document.getElementById('custom-modal');
+    if (modal) {
+        document.getElementById('modal-message').innerText = message;
+        modal.classList.add('active');
+    } else {
+        console.warn("Alert fallback:", message);
+    }
+};
+
 // --- Event Listeners ---
 function initEventListeners() {
+    // Custom Modal Close Event
+    const modalCloseBtn = document.getElementById('modal-close-btn');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', () => {
+            document.getElementById('custom-modal').classList.remove('active');
+        });
+    }
+
     // Subject selector
     subjectSelect.addEventListener('change', (e) => {
         if (e.target.value === 'add-new') {

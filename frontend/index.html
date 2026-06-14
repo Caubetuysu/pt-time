@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.0.7">
+    <link rel="stylesheet" href="style.css?v=1.0.8">
 </head>
 <body>
     <!-- Background grid overlay -->
@@ -314,11 +314,21 @@
 
     <!-- Hidden audio element for timer alarm bell using synthesis if preferred, but we use a synthesizer buzz anyway -->
     
+    <!-- Custom Modal Notification -->
+    <div id="custom-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-icon">🔔</div>
+            <h3 class="modal-title">Thông báo</h3>
+            <p id="modal-message" class="modal-message"></p>
+            <button id="modal-close-btn" class="btn-control btn-play">Đồng ý</button>
+        </div>
+    </div>
+
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
 
     <!-- Youtube IFrame Player API script will be loaded dynamically by app.js -->
-    <script src="app.js?v=1.0.1"></script>
+    <script src="app.js?v=1.0.2"></script>
 </body>
 </html>
