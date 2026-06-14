@@ -1088,8 +1088,8 @@ function initAuthUI() {
                 updateDashboard();
                 
                 // Refresh playlists
-                playlists.length = 1; // Keep only Morning Coffee
-                playlistSelect.innerHTML = '<option value="0">Lofi Girl - Morning Coffee</option>';
+                playlists.length = 1; // Keep only default playlist
+                playlistSelect.innerHTML = '<option value="0">HỌC CHILL</option>';
                 initCustomPlaylists();
             } else {
                 idToken = null;
@@ -1100,8 +1100,8 @@ function initAuthUI() {
                 initSubjects();
                 updateDashboard();
                 
-                playlists.length = 1; // Keep only Morning Coffee
-                playlistSelect.innerHTML = '<option value="0">Lofi Girl - Morning Coffee</option>';
+                playlists.length = 1; // Keep only default playlist
+                playlistSelect.innerHTML = '<option value="0">HỌC CHILL</option>';
                 initCustomPlaylists();
             }
         });
