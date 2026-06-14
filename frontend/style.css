@@ -1261,12 +1261,12 @@ body {
     box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
 }
 
-/* --- EXTRA LARGE SCREENS (Desktop > 1400px) --- */
-@media (min-width: 1400px) {
+/* --- EXTRA LARGE SCREENS (Desktop > 1024px) --- */
+@media (min-width: 1024px) {
     .app-container {
-        max-width: 1600px;
-        padding: 20px 40px;
-        gap: 16px;
+        max-width: 95%;
+        padding: 20px;
+        gap: 20px;
     }
     .timer-section {
         min-height: 480px;
