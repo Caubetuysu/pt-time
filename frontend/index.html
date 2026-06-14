@@ -177,7 +177,7 @@
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
                         <!-- LEFT COLUMN: Player display + controls -->
-                        <div>
+                        <div style="min-width: 0;">
                             <!-- YT Iframe Box Container -->
                             <div class="youtube-player-container">
                                 <div id="youtube-player"></div>
@@ -231,7 +231,7 @@
                         </div>
 
                         <!-- RIGHT COLUMN: Playlist + custom YT + rain -->
-                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                        <div style="display: flex; flex-direction: column; gap: 10px; min-width: 0;">
                             <div class="playlist-dropdown-wrapper">
                                 <label for="playlist-select" class="sr-only">Chọn Playlist</label>
                                 <select id="playlist-select" class="playlist-select">
