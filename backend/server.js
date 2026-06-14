@@ -45,18 +45,25 @@ function readDB() {
             // Re-create default DB if missing
             const defaultDB = {
                 subjects: ["Toán", "Văn", "Anh", "Code", "IELTS"],
-                sessions: []
+                sessions: [],
+                documents: [],
+                courses: []
             };
             fs.writeFileSync(DB_PATH, JSON.stringify(defaultDB, null, 2), 'utf8');
             return defaultDB;
         }
         const data = fs.readFileSync(DB_PATH, 'utf8');
-        return JSON.parse(data);
+        const parsed = JSON.parse(data);
+        if (!parsed.documents) parsed.documents = [];
+        if (!parsed.courses) parsed.courses = [];
+        return parsed;
     } catch (error) {
         console.error('Error reading database file:', error);
         return {
             subjects: ["Toán", "Văn", "Anh", "Code", "IELTS"],
-            sessions: []
+            sessions: [],
+            documents: [],
+            courses: []
         };
     }
 }
@@ -225,6 +232,161 @@ app.delete('/api/sessions', async (req, res) => {
             res.json({ message: 'Đã xóa toàn bộ lịch sử thành công.' });
         } else {
             res.status(500).json({ error: 'Không thể xóa lịch sử.' });
+        }
+    }
+});
+
+// --- Documents API Endpoints ---
+app.get('/api/documents', async (req, res) => {
+    if (useFirebase) {
+        try {
+            const snapshot = await firestoreDb.collection('documents').get();
+            const docs = [];
+            snapshot.forEach(doc => {
+                docs.push(doc.data());
+            });
+            res.json(docs);
+        } catch (error) {
+            console.error('Error fetching documents from Firebase:', error);
+            res.status(500).json({ error: 'Lỗi truy xuất danh sách tài liệu.' });
+        }
+    } else {
+        const db = readDB();
+        res.json(db.documents || []);
+    }
+});
+
+app.post('/api/documents', async (req, res) => {
+    const docItem = req.body;
+    if (!docItem || !docItem.title || !docItem.url) {
+        return res.status(400).json({ error: 'Thông tin tài liệu không hợp lệ.' });
+    }
+    
+    const newDoc = {
+        id: docItem.id || Date.now().toString(),
+        title: docItem.title.trim(),
+        category: docItem.category || 'Khác',
+        url: docItem.url.trim(),
+        timestamp: docItem.timestamp || new Date().toISOString()
+    };
+    
+    if (useFirebase) {
+        try {
+            await firestoreDb.collection('documents').doc(newDoc.id).set(newDoc);
+            res.status(201).json(newDoc);
+        } catch (error) {
+            console.error('Error saving document to Firebase:', error);
+            res.status(500).json({ error: 'Lỗi khi lưu tài liệu mới.' });
+        }
+    } else {
+        const db = readDB();
+        if (!db.documents) db.documents = [];
+        db.documents.push(newDoc);
+        if (writeDB(db)) {
+            res.status(201).json(newDoc);
+        } else {
+            res.status(500).json({ error: 'Không thể lưu tài liệu mới.' });
+        }
+    }
+});
+
+// --- Courses API Endpoints ---
+app.get('/api/courses', async (req, res) => {
+    if (useFirebase) {
+        try {
+            const snapshot = await firestoreDb.collection('courses').get();
+            const courses = [];
+            snapshot.forEach(doc => {
+                courses.push(doc.data());
+            });
+            res.json(courses);
+        } catch (error) {
+            console.error('Error fetching courses from Firebase:', error);
+            res.status(500).json({ error: 'Lỗi truy xuất danh sách khóa học.' });
+        }
+    } else {
+        const db = readDB();
+        res.json(db.courses || []);
+    }
+});
+
+app.post('/api/courses', async (req, res) => {
+    const courseItem = req.body;
+    if (!courseItem || !courseItem.title) {
+        return res.status(400).json({ error: 'Thông tin khóa học không hợp lệ.' });
+    }
+    
+    const newCourse = {
+        id: courseItem.id || Date.now().toString(),
+        title: courseItem.title.trim(),
+        teacher: courseItem.teacher || 'Tự học',
+        playlistId: courseItem.playlistId || '',
+        videoCount: parseInt(courseItem.videoCount) || 1,
+        completedVideos: courseItem.completedVideos || [],
+        currentVideoIndex: parseInt(courseItem.currentVideoIndex) || 0,
+        timestamp: courseItem.timestamp || new Date().toISOString()
+    };
+    
+    if (useFirebase) {
+        try {
+            await firestoreDb.collection('courses').doc(newCourse.id).set(newCourse);
+            res.status(201).json(newCourse);
+        } catch (error) {
+            console.error('Error saving course to Firebase:', error);
+            res.status(500).json({ error: 'Lỗi khi lưu khóa học mới.' });
+        }
+    } else {
+        const db = readDB();
+        if (!db.courses) db.courses = [];
+        db.courses.push(newCourse);
+        if (writeDB(db)) {
+            res.status(201).json(newCourse);
+        } else {
+            res.status(500).json({ error: 'Không thể lưu khóa học mới.' });
+        }
+    }
+});
+
+app.post('/api/courses/progress', async (req, res) => {
+    const { id, completedVideos, currentVideoIndex } = req.body;
+    if (!id) {
+        return res.status(400).json({ error: 'Thiếu ID khóa học.' });
+    }
+    
+    if (useFirebase) {
+        try {
+            const docRef = firestoreDb.collection('courses').doc(id);
+            const doc = await docRef.get();
+            if (!doc.exists) {
+                return res.status(404).json({ error: 'Không tìm thấy khóa học.' });
+            }
+            
+            await docRef.update({
+                completedVideos: completedVideos || [],
+                currentVideoIndex: parseInt(currentVideoIndex) || 0
+            });
+            
+            const updated = await docRef.get();
+            res.json(updated.data());
+        } catch (error) {
+            console.error('Error updating course progress in Firebase:', error);
+            res.status(500).json({ error: 'Lỗi khi cập nhật tiến độ học.' });
+        }
+    } else {
+        const db = readDB();
+        if (!db.courses) db.courses = [];
+        const index = db.courses.findIndex(c => c.id === id);
+        if (index === -1) {
+            return res.status(404).json({ error: 'Không tìm thấy khóa học.' });
+        }
+        
+        db.courses[index].completedVideos = completedVideos || [];
+        db.courses[index].currentVideoIndex = parseInt(currentVideoIndex) || 0;
+        
+        if (writeDB(db)) {
+            res.json(db.courses[index]);
+        } else {
+            res.status(500).json({ error: 'Không thể cập nhật tiến độ học.' });
         }
     }
 });

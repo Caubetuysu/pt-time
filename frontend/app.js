@@ -83,6 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
     initTimerUI();
     initEventListeners();
     updateDashboard();
+    initTabs();
+    initDocuments();
+    initCourses();
 });
 
 // --- Subject Management ---
@@ -943,4 +946,519 @@ function renderRecentLogs(history) {
         
         sessionLogsListEl.appendChild(li);
     });
+}
+
+// ==========================================================================
+// SPA Tab Switching Logic & Features (Documents & Courses)
+// ==========================================================================
+
+let documentsList = [];
+let coursesList = [];
+let currentViewingCourseId = null;
+
+// --- Tab Initialization ---
+function initTabs() {
+    const navItems = document.querySelectorAll('.nav-tab-item');
+    const tabWrappers = {
+        'home': document.getElementById('tab-home'),
+        'documents': document.getElementById('tab-documents'),
+        'courses': document.getElementById('tab-courses')
+    };
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const tabName = item.getAttribute('data-tab');
+            
+            // Set active class on nav buttons
+            navItems.forEach(n => {
+                n.classList.remove('active');
+                n.removeAttribute('aria-current');
+            });
+            item.classList.add('active');
+            item.setAttribute('aria-current', 'page');
+            
+            // Show corresponding tab content
+            Object.keys(tabWrappers).forEach(key => {
+                if (key === tabName) {
+                    tabWrappers[key].classList.remove('hidden');
+                } else {
+                    tabWrappers[key].classList.add('hidden');
+                }
+            });
+        });
+    });
+}
+
+// --- Documents Feature ---
+async function initDocuments() {
+    const toggleAddFormBtn = document.getElementById('toggle-add-doc-btn');
+    const cancelAddBtn = document.getElementById('cancel-add-doc-btn');
+    const addFormCard = document.getElementById('add-doc-form-card');
+    const addForm = document.getElementById('add-document-form');
+    const searchInput = document.getElementById('doc-search-input');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+
+    // Toggle add form
+    if (toggleAddFormBtn) {
+        toggleAddFormBtn.addEventListener('click', () => {
+            addFormCard.classList.toggle('hidden');
+            if (!addFormCard.classList.contains('hidden')) {
+                document.getElementById('doc-title').focus();
+            }
+        });
+    }
+
+    if (cancelAddBtn) {
+        cancelAddBtn.addEventListener('click', () => {
+            addFormCard.classList.add('hidden');
+            addForm.reset();
+        });
+    }
+
+    // Submit new document
+    if (addForm) {
+        addForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('doc-title').value.trim();
+            const url = document.getElementById('doc-url').value.trim();
+            const category = document.getElementById('doc-category').value;
+
+            if (!title || !url) return;
+
+            const newDoc = { title, url, category };
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/documents`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newDoc)
+                });
+                if (!res.ok) throw new Error('API error');
+                const savedDoc = await res.json();
+                
+                documentsList.push(savedDoc);
+                localStorage.setItem('zentime_documents', JSON.stringify(documentsList));
+            } catch (err) {
+                console.warn('API connection failed. Saving document locally.', err);
+                // Local fallback
+                const offlineDoc = {
+                    id: Date.now().toString(),
+                    title,
+                    url,
+                    category,
+                    timestamp: new Date().toISOString()
+                };
+                documentsList.push(offlineDoc);
+                localStorage.setItem('zentime_documents', JSON.stringify(documentsList));
+            }
+
+            addForm.reset();
+            addFormCard.classList.add('hidden');
+            renderDocuments();
+        });
+    }
+
+    // Real-time search
+    if (searchInput) {
+        searchInput.addEventListener('input', () => {
+            renderDocuments();
+        });
+    }
+
+    // Category filter click
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderDocuments();
+        });
+    });
+
+    // Initial load
+    await loadDocuments();
+}
+
+async function loadDocuments() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/documents`);
+        if (!res.ok) throw new Error('Server error');
+        documentsList = await res.json();
+        localStorage.setItem('zentime_documents', JSON.stringify(documentsList));
+    } catch (err) {
+        console.warn('Could not fetch documents from API. Falling back to local storage.', err);
+        documentsList = JSON.parse(localStorage.getItem('zentime_documents') || '[]');
+        if (documentsList.length === 0) {
+            // Default sample documents if empty
+            documentsList = [
+                { id: '1', title: '1000 Từ Vựng IELTS Core thông dụng nhất', category: 'IELTS', url: 'https://drive.google.com', timestamp: new Date().toISOString() },
+                { id: '2', title: 'Tổng Hợp Công Thức Giải Tích 12 Toán Học', category: 'Toán Học', url: 'https://drive.google.com', timestamp: new Date().toISOString() },
+                { id: '3', title: 'Cẩm Nang Học Javascript Từ Cơ Bản Đến Nâng Cao', category: 'Lập Trình', url: 'https://github.com', timestamp: new Date().toISOString() }
+            ];
+            localStorage.setItem('zentime_documents', JSON.stringify(documentsList));
+        }
+    }
+    renderDocuments();
+}
+
+function renderDocuments() {
+    const grid = document.getElementById('documents-grid');
+    if (!grid) return;
+    
+    const searchInput = document.getElementById('doc-search-input');
+    const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : '';
+    
+    const activeFilterBtn = document.querySelector('.filter-btn.active');
+    const activeFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-category') : 'all';
+
+    grid.innerHTML = '';
+
+    const filtered = documentsList.filter(doc => {
+        const matchesSearch = doc.title.toLowerCase().includes(searchVal);
+        const matchesCategory = activeFilter === 'all' || doc.category === activeFilter;
+        return matchesSearch && matchesCategory;
+    });
+
+    if (filtered.length === 0) {
+        grid.innerHTML = `<div class="empty-state">Không tìm thấy tài liệu phù hợp.</div>`;
+        return;
+    }
+
+    filtered.forEach(doc => {
+        const card = document.createElement('article');
+        card.className = 'black-card document-card';
+
+        // Emoji icons based on category
+        let categoryEmoji = '📁';
+        if (doc.category === 'IELTS') categoryEmoji = '🇬🇧';
+        if (doc.category === 'Toán Học') categoryEmoji = '📐';
+        if (doc.category === 'Lập Trình') categoryEmoji = '💻';
+
+        card.innerHTML = `
+            <div class="document-meta-top">
+                <div class="document-icon">${categoryEmoji}</div>
+                <span class="document-category-tag">${doc.category}</span>
+            </div>
+            <h3 class="document-title-text">${doc.title}</h3>
+            <div class="document-footer">
+                <span class="document-date">${new Date(doc.timestamp).toLocaleDateString('vi-VN')}</span>
+                <a href="${doc.url}" target="_blank" class="btn-download-doc">
+                    <span>Mở / Tải</span>
+                    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                </a>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// --- Courses Feature ---
+async function initCourses() {
+    const toggleAddFormBtn = document.getElementById('toggle-add-course-btn');
+    const cancelAddBtn = document.getElementById('cancel-add-course-btn');
+    const addFormCard = document.getElementById('add-course-form-card');
+    const addForm = document.getElementById('add-course-form');
+    
+    // Modal controls
+    const modal = document.getElementById('video-player-modal');
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    const btnPrevLesson = document.getElementById('btn-prev-lesson');
+    const btnNextLesson = document.getElementById('btn-next-lesson');
+    const btnCompleteLesson = document.getElementById('btn-complete-lesson');
+    const overlay = modal ? modal.querySelector('.modal-overlay') : null;
+
+    // Toggle add course form
+    if (toggleAddFormBtn) {
+        toggleAddFormBtn.addEventListener('click', () => {
+            addFormCard.classList.toggle('hidden');
+            if (!addFormCard.classList.contains('hidden')) {
+                document.getElementById('course-title').focus();
+            }
+        });
+    }
+
+    if (cancelAddBtn) {
+        cancelAddBtn.addEventListener('click', () => {
+            addFormCard.classList.add('hidden');
+            addForm.reset();
+        });
+    }
+
+    // Helper to parse YouTube playlist ID from URL or input
+    function parsePlaylistId(url) {
+        if (!url) return '';
+        if (url.includes('list=')) {
+            const matches = url.match(/[&?]list=([^&]+)/);
+            return matches ? matches[1] : url;
+        }
+        return url;
+    }
+
+    // Submit new course
+    if (addForm) {
+        addForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const title = document.getElementById('course-title').value.trim();
+            const teacher = document.getElementById('course-teacher').value.trim() || 'Tự học';
+            const rawPlaylistId = document.getElementById('course-playlist-id').value.trim();
+            const videoCount = parseInt(document.getElementById('course-video-count').value) || 10;
+
+            const playlistId = parsePlaylistId(rawPlaylistId);
+            if (!title) return;
+
+            const newCourse = {
+                title,
+                teacher,
+                playlistId,
+                videoCount,
+                completedVideos: [],
+                currentVideoIndex: 0
+            };
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/courses`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newCourse)
+                });
+                if (!res.ok) throw new Error('API error');
+                const savedCourse = await res.json();
+                coursesList.push(savedCourse);
+                localStorage.setItem('zentime_courses', JSON.stringify(coursesList));
+            } catch (err) {
+                console.warn('API connection failed. Saving course locally.', err);
+                // Local fallback
+                const offlineCourse = {
+                    ...newCourse,
+                    id: Date.now().toString(),
+                    timestamp: new Date().toISOString()
+                };
+                coursesList.push(offlineCourse);
+                localStorage.setItem('zentime_courses', JSON.stringify(coursesList));
+            }
+
+            addForm.reset();
+            addFormCard.classList.add('hidden');
+            renderCourses();
+        });
+    }
+
+    // Close Modal actions
+    const closeModal = () => {
+        if (modal) modal.classList.add('hidden');
+        // Clear iframe source to stop video playback
+        const container = document.getElementById('modal-youtube-iframe-container');
+        if (container) container.innerHTML = '';
+        currentViewingCourseId = null;
+    };
+
+    if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+    if (overlay) overlay.addEventListener('click', closeModal);
+
+    // Modal Lesson Navigation & Completed status
+    if (btnPrevLesson) {
+        btnPrevLesson.addEventListener('click', () => {
+            const course = coursesList.find(c => c.id === currentViewingCourseId);
+            if (!course || course.currentVideoIndex <= 0) return;
+            course.currentVideoIndex--;
+            updateModalPlayer();
+            saveCourseProgress(course);
+        });
+    }
+
+    if (btnNextLesson) {
+        btnNextLesson.addEventListener('click', () => {
+            const course = coursesList.find(c => c.id === currentViewingCourseId);
+            if (!course || course.currentVideoIndex >= course.videoCount - 1) return;
+            course.currentVideoIndex++;
+            updateModalPlayer();
+            saveCourseProgress(course);
+        });
+    }
+
+    if (btnCompleteLesson) {
+        btnCompleteLesson.addEventListener('click', () => {
+            const course = coursesList.find(c => c.id === currentViewingCourseId);
+            if (!course) return;
+            
+            const currentIdx = course.currentVideoIndex;
+            if (!course.completedVideos.includes(currentIdx)) {
+                course.completedVideos.push(currentIdx);
+            } else {
+                // Toggle complete (uncheck)
+                course.completedVideos = course.completedVideos.filter(idx => idx !== currentIdx);
+            }
+
+            updateModalPlayer();
+            saveCourseProgress(course);
+            renderCourses();
+        });
+    }
+
+    // Load initial list
+    await loadCourses();
+}
+
+async function loadCourses() {
+    try {
+        const res = await fetch(`${API_BASE_URL}/courses`);
+        if (!res.ok) throw new Error('Server error');
+        coursesList = await res.json();
+        localStorage.setItem('zentime_courses', JSON.stringify(coursesList));
+    } catch (err) {
+        console.warn('Could not fetch courses from API. Falling back to local storage.', err);
+        coursesList = JSON.parse(localStorage.getItem('zentime_courses') || '[]');
+        if (coursesList.length === 0) {
+            // Default sample courses
+            coursesList = [
+                { id: '1', title: 'Lập Trình Web Fullstack hiện đại (NodeJS / React)', teacher: 'F8 Fullstack', playlistId: 'PLw717l4Vd8p45-F7v8uY4f2N0M2jR8YfF', videoCount: 30, completedVideos: [0, 1, 2], currentVideoIndex: 3, timestamp: new Date().toISOString() },
+                { id: '2', title: 'IELTS Speaking Band 7.5+ Masterclass', teacher: 'IELTS Simon', playlistId: '', videoCount: 15, completedVideos: [0], currentVideoIndex: 1, timestamp: new Date().toISOString() }
+            ];
+            localStorage.setItem('zentime_courses', JSON.stringify(coursesList));
+        }
+    }
+    renderCourses();
+}
+
+function renderCourses() {
+    const grid = document.getElementById('courses-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = '';
+
+    if (coursesList.length === 0) {
+        grid.innerHTML = `<div class="empty-state">Chưa có khóa học nào được đăng ký.</div>`;
+        return;
+    }
+
+    let totalAllVideos = 0;
+    let totalAllCompleted = 0;
+
+    coursesList.forEach((course, index) => {
+        totalAllVideos += course.videoCount;
+        totalAllCompleted += course.completedVideos.length;
+
+        const card = document.createElement('div');
+        card.className = 'black-card course-card';
+        card.setAttribute('data-index', index % 3); // for colorful gradient thumbnails
+
+        const progressPercent = Math.round((course.completedVideos.length / course.videoCount) * 100) || 0;
+
+        card.innerHTML = `
+            <div class="course-thumbnail"></div>
+            <span class="course-teacher-label">Kênh: ${course.teacher}</span>
+            <h3 class="course-title-text">${course.title}</h3>
+            
+            <div class="course-progress-section">
+                <div class="course-progress-labels">
+                    <span>Đã học: ${course.completedVideos.length}/${course.videoCount} bài</span>
+                    <span>${progressPercent}%</span>
+                </div>
+                <div class="course-progress-bar-bg">
+                    <div class="course-progress-bar-fill" style="width: ${progressPercent}%;"></div>
+                </div>
+            </div>
+            
+            <button type="button" class="btn-learn-course" onclick="openCoursePlayer('${course.id}')">Học tiếp</button>
+        `;
+        grid.appendChild(card);
+    });
+
+    // Update Overall Stats bar
+    const overallPercent = Math.round((totalAllCompleted / totalAllVideos) * 100) || 0;
+    const overallText = document.getElementById('overall-progress-text');
+    const overallFill = document.getElementById('overall-progress-fill');
+    if (overallText) overallText.textContent = `${overallPercent}%`;
+    if (overallFill) overallFill.style.width = `${overallPercent}%`;
+}
+
+// Global functions for inline Event triggers
+window.openCoursePlayer = function(courseId) {
+    const course = coursesList.find(c => c.id === courseId);
+    if (!course) return;
+
+    currentViewingCourseId = courseId;
+    
+    const titleEl = document.getElementById('modal-course-title');
+    if (titleEl) titleEl.textContent = course.title;
+    
+    // Show Modal
+    const modal = document.getElementById('video-player-modal');
+    if (modal) modal.classList.remove('hidden');
+    
+    updateModalPlayer();
+};
+
+function updateModalPlayer() {
+    const course = coursesList.find(c => c.id === currentViewingCourseId);
+    if (!course) return;
+
+    const iframeContainer = document.getElementById('modal-youtube-iframe-container');
+    const lessonNumEl = document.getElementById('current-lesson-num');
+    const totalLessonsEl = document.getElementById('total-lessons-num');
+    const completeBtn = document.getElementById('btn-complete-lesson');
+
+    if (lessonNumEl) lessonNumEl.textContent = course.currentVideoIndex + 1;
+    if (totalLessonsEl) totalLessonsEl.textContent = course.videoCount;
+
+    // Toggle button completed text and style
+    if (completeBtn) {
+        const isCompleted = course.completedVideos.includes(course.currentVideoIndex);
+        if (isCompleted) {
+            completeBtn.textContent = '✓ Đã hoàn thành';
+            completeBtn.style.background = 'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)';
+            completeBtn.style.color = '#fff';
+        } else {
+            completeBtn.textContent = '✓ Hoàn thành bài này';
+            completeBtn.style.background = '';
+            completeBtn.style.color = '';
+        }
+    }
+
+    // Load video player
+    if (iframeContainer) {
+        if (course.playlistId) {
+            // Embed YouTube playlist with specific video index
+            iframeContainer.innerHTML = `
+                <iframe 
+                    src="https://www.youtube.com/embed/videoseries?list=${course.playlistId}&index=${course.currentVideoIndex}&enablejsapi=1"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                    allowfullscreen>
+                </iframe>
+            `;
+        } else {
+            // Mock video player when no playlist id is configured
+            iframeContainer.innerHTML = `
+                <div class="video-placeholder">
+                    <p>Khóa học này đang ở chế độ học ngoại tuyến/không có Playlist YouTube.</p>
+                    <p style="font-size: 0.8rem; margin-top: 5px;">Bạn có thể mở khóa học và đánh dấu hoàn thành bài học để theo dõi tiến độ!</p>
+                </div>
+            `;
+        }
+    }
+}
+
+async function saveCourseProgress(course) {
+    try {
+        const res = await fetch(`${API_BASE_URL}/courses/progress`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                id: course.id,
+                completedVideos: course.completedVideos,
+                currentVideoIndex: course.currentVideoIndex
+            })
+        });
+        if (!res.ok) throw new Error('API error');
+        const updated = await res.json();
+        
+        // Update local object
+        const localIndex = coursesList.findIndex(c => c.id === course.id);
+        if (localIndex !== -1) {
+            coursesList[localIndex] = updated;
+        }
+        localStorage.setItem('zentime_courses', JSON.stringify(coursesList));
+    } catch (err) {
+        console.warn('API connection failed. Saving course progress locally.', err);
+        localStorage.setItem('zentime_courses', JSON.stringify(coursesList));
+    }
 }
