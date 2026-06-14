@@ -61,6 +61,7 @@ const ytNextBtn = document.getElementById('yt-next-btn');
 const ytVolumeSlider = document.getElementById('yt-volume');
 const ytVolumePercent = document.getElementById('yt-volume-percent');
 const ytCustomLink = document.getElementById('yt-custom-link');
+const ytCustomName = document.getElementById('yt-custom-name');
 const btnAddYt = document.getElementById('btn-add-yt');
 
 const rainToggle = document.getElementById('rain-toggle');
@@ -78,6 +79,7 @@ const CIRCLE_CIRCUMFERENCE = 597;
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
+    initCustomPlaylists();
     initSubjects();
     initTimerUI();
     initEventListeners();
@@ -684,6 +686,24 @@ function toggleYtPlay() {
     }
 }
 
+function initCustomPlaylists() {
+    const saved = localStorage.getItem('zentime_custom_playlists');
+    if (saved) {
+        try {
+            const customArr = JSON.parse(saved);
+            customArr.forEach(item => {
+                playlists.push(item);
+                const option = document.createElement('option');
+                option.value = playlists.length - 1;
+                option.textContent = item.title;
+                playlistSelect.appendChild(option);
+            });
+        } catch(e) {
+            console.error('Lỗi khi tải playlist tùy chỉnh', e);
+        }
+    }
+}
+
 function extractYouTubeId(url) {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     const match = url.match(regExp);
@@ -701,16 +721,29 @@ function addCustomYtVideo() {
         return;
     }
     
-    playlists.push({ type: 'video', id: videoId, title: 'Nhạc tùy chỉnh' });
+    let customName = ytCustomName && ytCustomName.value.trim() !== '' ? ytCustomName.value.trim() : ('Nhạc tùy chỉnh (' + videoId + ')');
+    const newItem = { type: 'video', id: videoId, title: customName };
+    
+    playlists.push(newItem);
     const newIndex = playlists.length - 1;
     
     const option = document.createElement('option');
     option.value = newIndex;
-    option.textContent = 'Nhạc tùy chỉnh (' + videoId + ')';
+    option.textContent = customName;
     playlistSelect.appendChild(option);
+    
+    try {
+        const saved = localStorage.getItem('zentime_custom_playlists');
+        const customArr = saved ? JSON.parse(saved) : [];
+        customArr.push(newItem);
+        localStorage.setItem('zentime_custom_playlists', JSON.stringify(customArr));
+    } catch(e) {
+        console.error('Lỗi khi lưu playlist', e);
+    }
     
     playlistSelect.value = newIndex;
     ytCustomLink.value = '';
+    if (ytCustomName) ytCustomName.value = '';
     loadSelectedPlaylist();
 }
 

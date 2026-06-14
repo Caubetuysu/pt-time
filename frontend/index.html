@@ -187,9 +187,12 @@
                             </select>
                         </div>
                         
-                        <div class="custom-yt-input" style="display: flex; gap: 8px;">
-                            <input type="text" id="yt-custom-link" placeholder="Hoặc dán link/ID YouTube..." style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; color: var(--text-white); font-size: 0.8rem; outline: none; font-family: inherit;">
-                            <button type="button" id="btn-add-yt" class="btn-apply-preset" style="padding: 6px 12px; font-size: 0.8rem; height: auto;">Phát</button>
+                        <div class="custom-yt-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
+                            <input type="text" id="yt-custom-name" placeholder="Tên bài hát (Để trống tự lấy ID)..." style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; color: var(--text-white); font-size: 0.8rem; outline: none; font-family: inherit; width: 100%;">
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="yt-custom-link" placeholder="Dán link hoặc ID YouTube..." style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; color: var(--text-white); font-size: 0.8rem; outline: none; font-family: inherit;">
+                                <button type="button" id="btn-add-yt" class="btn-apply-preset" style="padding: 6px 12px; font-size: 0.8rem; height: auto;">Lưu & Phát</button>
+                            </div>
                         </div>
                         
                         <div class="player-btn-row">
