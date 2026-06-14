@@ -1146,11 +1146,13 @@ body {
 }
 
 #tab-sound .centered-tab-card {
-    max-width: 100%;
+    max-width: 100% !important;
+    width: 100% !important;
 }
 
 #tab-stats .centered-tab-card {
-    max-width: 100%;
+    max-width: 100% !important;
+    width: 100% !important;
 }
 
 @media (max-width: 768px) {
