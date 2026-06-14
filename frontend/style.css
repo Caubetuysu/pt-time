@@ -811,8 +811,8 @@ body {
 
 /* Ambient Natural Rain Generator */
 .ambient-mixer {
-    margin-top: 18px;
-    padding-top: 18px;
+    margin-top: 10px;
+    padding-top: 10px;
     border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
@@ -1135,8 +1135,7 @@ body {
     justify-content: center;
     align-items: flex-start;
     width: 100%;
-    min-height: calc(100vh - 180px);
-    padding: 20px 0;
+    padding: 10px 0;
 }
 
 .centered-tab-card {
@@ -1146,7 +1145,7 @@ body {
 }
 
 #tab-sound .centered-tab-card {
-    max-width: 600px;
+    max-width: 860px;
 }
 
 #tab-stats .centered-tab-card {

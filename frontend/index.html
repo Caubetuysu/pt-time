@@ -161,102 +161,100 @@
                                 <div class="custom-input-group">
                                     <input type="number" id="custom-minutes-input" min="1" max="999" placeholder="Phút" aria-label="Số phút tùy chỉnh">
                                     <button type="button" id="apply-custom-btn" class="btn-apply-preset">Đặt</button>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </main>
-        </div>
-
-        <!-- TAB: SOUND -->
+                        <!-- TAB: SOUND -->
         <div id="tab-sound" class="tab-content hidden">
             <div class="single-card-layout">
                 <!-- FOCUS MUSIC PLAYER -->
                 <section class="player-section black-card centered-tab-card" aria-labelledby="player-heading">
                     <h2 id="player-heading" class="card-title">Âm thanh tập trung (Focus Sound)</h2>
                     
-                    <!-- YT Iframe Box Container -->
-                    <div class="youtube-player-container">
-                        <div id="youtube-player"></div>
-                        <div class="player-overlay">
-                            <div class="vinyl-record">
-                                <div class="vinyl-center"></div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: start;">
+                        <!-- LEFT COLUMN: Player display + controls -->
+                        <div>
+                            <!-- YT Iframe Box Container -->
+                            <div class="youtube-player-container">
+                                <div id="youtube-player"></div>
+                                <div class="player-overlay">
+                                    <div class="vinyl-record">
+                                        <div class="vinyl-center"></div>
+                                    </div>
+                                    <div class="track-details">
+                                        <span id="current-track-title" class="track-title">YouTube Player API</span>
+                                        <span id="current-track-status" class="track-status">Đang tải cấu hình...</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="track-details">
-                                <span id="current-track-title" class="track-title">YouTube Player API</span>
-                                <span id="current-track-status" class="track-status">Đang tải cấu hình...</span>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- YT Player Controls -->
-                    <div class="player-controls">
-                        <div class="playlist-dropdown-wrapper">
-                            <label for="playlist-select" class="sr-only">Chọn Playlist</label>
-                            <select id="playlist-select" class="playlist-select">
-                                <option value="0">Lofi Girl - Morning Coffee</option>
-                            </select>
-                        </div>
-                        
-                        <div class="custom-yt-container" style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px;">
-                            <input type="text" id="yt-custom-name" placeholder="Tên bài hát (Để trống tự lấy ID)..." style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; color: var(--text-white); font-size: 0.8rem; outline: none; font-family: inherit; width: 100%;">
-                            <div style="display: flex; gap: 8px;">
-                                <input type="text" id="yt-custom-link" placeholder="Dán link hoặc ID YouTube..." style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; color: var(--text-white); font-size: 0.8rem; outline: none; font-family: inherit;">
-                                <button type="button" id="btn-add-yt" class="btn-apply-preset" style="padding: 6px 12px; font-size: 0.8rem; height: auto;">Lưu & Phát</button>
+                            <!-- YT Player Controls -->
+                            <div class="player-btn-row" style="margin-bottom: 10px;">
+                                <button type="button" id="yt-prev-btn" class="btn-player-control" aria-label="Bài trước">
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M12 2L6 7L12 12V2Z" fill="currentColor"/>
+                                        <path d="M4 2L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <button type="button" id="yt-play-btn" class="btn-player-control btn-player-play" aria-label="Bật/Tắt Nhạc">
+                                    <svg class="yt-icon-play" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 1.5L11.5 8L1 14.5V1.5Z" fill="currentColor"/>
+                                    </svg>
+                                    <svg class="yt-icon-pause hidden" width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 1V13M10 1V13" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                                <button type="button" id="yt-next-btn" class="btn-player-control" aria-label="Bài tiếp theo">
+                                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2 2L8 7L2 12V2Z" fill="currentColor"/>
+                                        <path d="M10 2L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <!-- YT Volume Slider -->
+                            <div class="slider-group">
+                                <span class="slider-icon">
+                                    <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M1 4.5V9.5H4L8 12.5V1.5L4 4.5H1Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+                                        <path d="M11 4C11.5 5 11.5 6 11 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                        <path d="M13.5 2C14.8333 3.66667 14.8333 5.33333 13.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                                    </svg>
+                                </span>
+                                <input type="range" id="yt-volume" class="slider-bar" min="0" max="100" value="50" aria-label="Âm lượng nhạc Lofi">
+                                <span id="yt-volume-percent" class="slider-val">50%</span>
                             </div>
                         </div>
-                        
-                        <div class="player-btn-row">
-                            <button type="button" id="yt-prev-btn" class="btn-player-control" aria-label="Bài trước">
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M12 2L6 7L12 12V2Z" fill="currentColor"/>
-                                    <path d="M4 2L4 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                            </button>
-                            <button type="button" id="yt-play-btn" class="btn-player-control btn-player-play" aria-label="Bật/Tắt Nhạc">
-                                <svg class="yt-icon-play" width="14" height="16" viewBox="0 0 14 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M1 1.5L11.5 8L1 14.5V1.5Z" fill="currentColor"/>
-                                </svg>
-                                <svg class="yt-icon-pause hidden" width="12" height="14" viewBox="0 0 12 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 1V13M10 1V13" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-                                </svg>
-                            </button>
-                            <button type="button" id="yt-next-btn" class="btn-player-control" aria-label="Bài tiếp theo">
-                                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M2 2L8 7L2 12V2Z" fill="currentColor"/>
-                                    <path d="M10 2L10 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-                                </svg>
-                            </button>
-                        </div>
 
-                        <!-- YT Volume Slider -->
-                        <div class="slider-group">
-                            <span class="slider-icon">
-                                <svg width="16" height="14" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path d="M1 4.5V9.5H4L8 12.5V1.5L4 4.5H1Z" fill="currentColor" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
-                                    <path d="M11 4C11.5 5 11.5 6 11 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                    <path d="M13.5 2C14.8333 3.66667 14.8333 5.33333 13.5 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                                </svg>
-                            </span>
-                            <input type="range" id="yt-volume" class="slider-bar" min="0" max="100" value="50" aria-label="Âm lượng nhạc Lofi">
-                            <span id="yt-volume-percent" class="slider-val">50%</span>
-                        </div>
-                    </div>
-
-                    <!-- Ambient Natural Sounds Mixer -->
-                    <div class="ambient-mixer">
-                        <div class="mixer-header">
-                            <span class="mixer-title">Trộn tiếng mưa (Web Audio Rain)</span>
-                            <div class="toggle-wrapper">
-                                <input type="checkbox" id="rain-toggle" class="toggle-checkbox">
-                                <label for="rain-toggle" class="toggle-label"></label>
+                        <!-- RIGHT COLUMN: Playlist + custom YT + rain -->
+                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                            <div class="playlist-dropdown-wrapper">
+                                <label for="playlist-select" class="sr-only">Chọn Playlist</label>
+                                <select id="playlist-select" class="playlist-select">
+                                    <option value="0">Lofi Girl - Morning Coffee</option>
+                                </select>
                             </div>
-                        </div>
-                        <div class="slider-group">
-                            <span class="slider-icon">🌧️</span>
-                            <input type="range" id="rain-volume" class="slider-bar" min="0" max="100" value="30" disabled aria-label="Âm lượng tiếng mưa">
-                            <span id="rain-volume-percent" class="slider-val">30%</span>
+                            
+                            <div class="custom-yt-container" style="display: flex; flex-direction: column; gap: 6px;">
+                                <input type="text" id="yt-custom-name" placeholder="Tên bài hát (Để trống tự lấy ID)..." style="background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; color: var(--text-white); font-size: 0.8rem; outline: none; font-family: inherit; width: 100%; box-sizing: border-box;">
+                                <div style="display: flex; gap: 8px;">
+                                    <input type="text" id="yt-custom-link" placeholder="Dán link hoặc ID YouTube..." style="flex: 1; background: rgba(255,255,255,0.02); border: 1px solid var(--card-border); border-radius: 8px; padding: 6px 12px; color: var(--text-white); font-size: 0.8rem; outline: none; font-family: inherit;">
+                                    <button type="button" id="btn-add-yt" class="btn-apply-preset" style="padding: 6px 12px; font-size: 0.8rem; height: auto;">Lưu &amp; Phát</button>
+                                </div>
+                            </div>
+
+                            <!-- Ambient Natural Sounds Mixer -->
+                            <div class="ambient-mixer" style="margin-top: 4px; padding-top: 10px;">
+                                <div class="mixer-header">
+                                    <span class="mixer-title">Trộn tiếng mưa (Web Audio Rain)</span>
+                                    <div class="toggle-wrapper">
+                                        <input type="checkbox" id="rain-toggle" class="toggle-checkbox">
+                                        <label for="rain-toggle" class="toggle-label"></label>
+                                    </div>
+                                </div>
+                                <div class="slider-group">
+                                    <span class="slider-icon">🌧️</span>
+                                    <input type="range" id="rain-volume" class="slider-bar" min="0" max="100" value="30" disabled aria-label="Âm lượng tiếng mưa">
+                                    <span id="rain-volume-percent" class="slider-val">30%</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
