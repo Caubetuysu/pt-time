@@ -142,7 +142,7 @@ function updateTimerDisplay() {
     
     // Document Title Update for background tracking
     const modeIndicator = timerMode === 'focus' ? '🎯' : (timerMode === 'ielts' ? '🗣️' : '☕');
-    document.title = `${formattedMinutes}:${formattedSeconds} ${modeIndicator} ZenTime`;
+    document.title = `${formattedMinutes}:${formattedSeconds} ${modeIndicator} PT Time`;
 
     // Circular progress stroke calculation
     const progressOffset = CIRCLE_CIRCUMFERENCE * (1 - (secondsRemaining / totalDurationSeconds));

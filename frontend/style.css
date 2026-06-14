@@ -16,6 +16,8 @@
     --neon-cyan-glow: rgba(0, 242, 254, 0.15);
     --neon-pink: #FF2E93;
     --neon-pink-glow: rgba(255, 46, 147, 0.15);
+    --neon-green: #39FF14;
+    --neon-green-glow: rgba(57, 255, 20, 0.25);
     
     --text-white: #FFFFFF;
     --text-muted: rgba(255, 255, 255, 0.45);
@@ -124,11 +126,13 @@ body {
     font-size: 1.5rem;
     font-weight: 600;
     letter-spacing: 0.1rem;
-    text-transform: uppercase;
+    text-transform: none;
+    color: var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green-glow);
 }
 
 .logo-accent {
-    color: var(--neon-cyan);
+    color: var(--neon-green);
     font-weight: 300;
 }
 
