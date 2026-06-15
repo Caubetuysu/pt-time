@@ -49,6 +49,47 @@ let timerInterval = null;
 let startTime = null;
 let elapsedBeforePause = 0;
 
+// --- State Persistence ---
+function saveTimerState() {
+    const state = {
+        totalDurationSeconds,
+        secondsRemaining,
+        timerState,
+        timerMode,
+        selectedSubject,
+        startTime,
+        elapsedBeforePause
+    };
+    localStorage.setItem('zentime_timer_state', JSON.stringify(state));
+}
+
+function loadTimerState() {
+    const saved = localStorage.getItem('zentime_timer_state');
+    if (saved) {
+        try {
+            const state = JSON.parse(saved);
+            totalDurationSeconds = state.totalDurationSeconds;
+            timerState = state.timerState;
+            timerMode = state.timerMode;
+            selectedSubject = state.selectedSubject || 'Chưa chọn';
+            startTime = state.startTime;
+            elapsedBeforePause = state.elapsedBeforePause;
+            
+            if (timerState === 'running' && startTime) {
+                const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000) + elapsedBeforePause;
+                secondsRemaining = Math.max(0, totalDurationSeconds - elapsedSeconds);
+                if (secondsRemaining <= 0) {
+                    timerState = 'idle';
+                }
+            } else {
+                secondsRemaining = state.secondsRemaining;
+            }
+        } catch(e) {
+            console.warn('Could not parse saved timer state', e);
+        }
+    }
+}
+
 // Web Audio API State
 let audioContext = null;
 let rainNode = null;
@@ -160,8 +201,59 @@ function renderSubjectDropdown(subjects) {
 
 // --- Timer UI Setup ---
 function initTimerUI() {
+    loadTimerState();
+    
+    // UI restorations based on loaded state
+    updateBadgeTheme(timerMode);
+    
+    // Resume interval if it was running
+    if (timerState === 'running') {
+        playPauseBtn.querySelector('.icon-play').classList.add('hidden');
+        playPauseBtn.querySelector('.icon-pause').classList.remove('hidden');
+        playPauseText.textContent = 'Tạm dừng';
+        
+        timerInterval = setInterval(() => {
+            const elapsedSeconds = Math.floor((Date.now() - startTime) / 1000) + elapsedBeforePause;
+            secondsRemaining = Math.max(0, totalDurationSeconds - elapsedSeconds);
+            
+            updateTimerDisplay();
+            
+            if (secondsRemaining <= 0) {
+                timerCompleted();
+            }
+        }, 100);
+    } else if (timerState === 'paused') {
+        playPauseBtn.querySelector('.icon-play').classList.remove('hidden');
+        playPauseBtn.querySelector('.icon-pause').classList.add('hidden');
+        playPauseText.textContent = 'Tiếp tục';
+        timerSublabel.textContent = 'Đã tạm dừng';
+    } else {
+        timerSublabel.textContent = 'Sẵn sàng để bắt đầu';
+    }
+
+    updateControlBtnStyles();
     updateTimerDisplay();
     applyClockStyle();
+    
+    // Update active preset button if it matches
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (parseInt(btn.getAttribute('data-minutes')) * 60 === totalDurationSeconds && btn.getAttribute('data-mode') === timerMode) {
+            btn.classList.add('active');
+        }
+    });
+
+    if (selectedSubject !== 'Chưa chọn') {
+        const optionExists = Array.from(subjectSelect.options).some(opt => opt.value === selectedSubject);
+        if (!optionExists) {
+            const option = document.createElement('option');
+            option.value = selectedSubject;
+            option.textContent = selectedSubject === 'IELTS' ? 'IELTS Speaking' : selectedSubject;
+            subjectSelect.insertBefore(option, subjectSelect.lastElementChild);
+        }
+        subjectSelect.value = selectedSubject;
+        timerSubjectDisplay.textContent = selectedSubject === 'IELTS' ? 'IELTS Speaking' : selectedSubject;
+    }
 }
 
 function toggleClockStyle() {
@@ -338,6 +430,7 @@ function initEventListeners() {
             selectedSubject = e.target.value;
             timerSubjectDisplay.textContent = selectedSubject === 'Chưa chọn' ? 'Chưa chọn môn' : selectedSubject;
             newSubjectForm.classList.add('hidden');
+            saveTimerState();
         }
     });
 
@@ -466,6 +559,7 @@ async function saveCustomSubject() {
             timerSubjectDisplay.textContent = val;
             newSubjectInput.value = '';
             newSubjectForm.classList.add('hidden');
+            saveTimerState();
             return;
         } catch (error) {
             console.warn('Could not POST new subject to backend API. Saving locally.', error);
@@ -485,6 +579,7 @@ async function saveCustomSubject() {
     timerSubjectDisplay.textContent = val;
     newSubjectInput.value = '';
     newSubjectForm.classList.add('hidden');
+    saveTimerState();
 }
 
 async function setTimerPreset(minutes, mode) {
@@ -503,6 +598,7 @@ async function setTimerPreset(minutes, mode) {
     // Update Badge & UI theme colors
     updateBadgeTheme(mode);
     updateTimerDisplay();
+    saveTimerState();
 }
 
 function updateBadgeTheme(mode) {
@@ -585,6 +681,7 @@ function startTimer() {
     }, 100);
     
     timerSublabel.textContent = timerMode === 'focus' ? 'Tập trung học tập...' : (timerMode === 'break' ? 'Nghỉ ngơi thư giãn...' : 'Luyện IELTS Speaking...');
+    saveTimerState();
 }
 
 function pauseTimer() {
@@ -601,6 +698,7 @@ function pauseTimer() {
     
     updateControlBtnStyles();
     timerSublabel.textContent = 'Đã tạm dừng';
+    saveTimerState();
 }
 
 function resetTimer() {
@@ -617,11 +715,13 @@ function resetTimer() {
     updateControlBtnStyles();
     updateTimerDisplay();
     timerSublabel.textContent = 'Sẵn sàng để bắt đầu';
+    saveTimerState();
 }
 
 function timerCompleted() {
     clearInterval(timerInterval);
     timerState = 'idle';
+    saveTimerState();
     
     // Play beautiful synthetic sound
     playAlarmSound();
