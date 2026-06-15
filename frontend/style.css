@@ -169,7 +169,8 @@ body {
 }
 
 .logo-time {
-    font-weight: 300;
+    font-weight: 600;
+    font-size: 1.1em;
     color: var(--neon-cyan);
     letter-spacing: 0.02em;
     margin-left: 2px;
