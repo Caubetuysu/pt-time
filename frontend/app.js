@@ -195,25 +195,8 @@ function updateTimerDisplay() {
     timerClock.textContent = `${formattedMinutes}:${formattedSeconds}`;
     
     // Flip Clock Update
-    const flipMinEl = document.getElementById('flip-min');
-    const flipSecEl = document.getElementById('flip-sec');
-    
-    if (flipMinEl && flipMinEl.textContent !== formattedMinutes) {
-        flipMinEl.textContent = formattedMinutes;
-        // Trigger animation
-        const flipGroup = flipMinEl.closest('.flip-group');
-        flipGroup.classList.remove('flip-animate');
-        void flipGroup.offsetWidth; // Force reflow
-        flipGroup.classList.add('flip-animate');
-    }
-    if (flipSecEl && flipSecEl.textContent !== formattedSeconds) {
-        flipSecEl.textContent = formattedSeconds;
-        // Trigger animation
-        const flipGroup = flipSecEl.closest('.flip-group');
-        flipGroup.classList.remove('flip-animate');
-        void flipGroup.offsetWidth; // Force reflow
-        flipGroup.classList.add('flip-animate');
-    }
+    updateFlipClock('min', formattedMinutes);
+    updateFlipClock('sec', formattedSeconds);
     
     // Document Title Update for background tracking
     const modeIndicator = timerMode === 'focus' ? '🎯' : (timerMode === 'ielts' ? '🗣️' : '☕');
@@ -222,6 +205,38 @@ function updateTimerDisplay() {
     // Circular progress stroke calculation
     const progressOffset = CIRCLE_CIRCUMFERENCE * (1 - (secondsRemaining / totalDurationSeconds));
     timerCircleProgress.style.strokeDashoffset = progressOffset;
+}
+
+function updateFlipClock(idPrefix, newValue) {
+    const card = document.getElementById(`flip-card-${idPrefix}`);
+    if (!card) return;
+    
+    const currentVal = card.getAttribute('data-val');
+    if (currentVal === newValue) return;
+
+    // Elements
+    const top = document.getElementById(`flip-${idPrefix}-top`);
+    const bottom = document.getElementById(`flip-${idPrefix}-bottom`);
+    const flapTop = document.getElementById(`flip-${idPrefix}-flap-top`);
+    const flapBottom = document.getElementById(`flip-${idPrefix}-flap-bottom`);
+
+    // Prepare elements for flip
+    top.textContent = newValue;
+    bottom.textContent = currentVal;
+    flapTop.textContent = currentVal;
+    flapBottom.textContent = newValue;
+
+    card.setAttribute('data-val', newValue);
+
+    // Trigger animation
+    card.classList.remove('flip-animate');
+    void card.offsetWidth; // Force reflow
+    card.classList.add('flip-animate');
+
+    // After animation finishes, update bottom to the new value
+    setTimeout(() => {
+        bottom.textContent = newValue;
+    }, 500);
 }
 
 // --- Custom Modal Override ---

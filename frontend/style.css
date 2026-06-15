@@ -1356,35 +1356,74 @@ body.is-fullscreen-timer .btn-fullscreen {
     flex-direction: column;
 }
 .flip-card {
-    background: #18181b;
-    border-radius: 16px;
-    padding: 20px;
+    position: relative;
+    width: 140px;
+    height: 160px;
     color: #fff;
     font-size: 6rem;
     font-weight: 700;
     font-family: monospace, sans-serif;
-    position: relative;
+    perspective: 1000px;
+    margin: 0;
+}
+.flip-card-top, .flip-card-bottom, .flip-card-flap-top, .flip-card-flap-bottom {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 50%;
+    overflow: hidden;
+    background: #18181b;
     border: 1px solid rgba(255,255,255,0.1);
     box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255,255,255,0.15);
-    width: 140px;
-    text-align: center;
-    overflow: hidden;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
-.flip-card-inner {
-    position: relative;
+.flip-card-top, .flip-card-flap-top {
+    top: 0;
+    border-bottom: none;
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+    transform-origin: 50% 100%;
+}
+.flip-card-bottom, .flip-card-flap-bottom {
+    bottom: 0;
+    border-top: none;
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    transform-origin: 50% 0%;
+}
+.flip-card-top span, .flip-card-flap-top span {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(50%);
+    line-height: 1;
+}
+.flip-card-bottom span, .flip-card-flap-bottom span {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    line-height: 1;
+}
+.flip-card-flap-top {
     z-index: 2;
-    transition: transform 0.1s;
 }
+.flip-card-flap-bottom {
+    z-index: 2;
+    transform: rotateX(90deg);
+}
+
 /* Đường chẻ giữa thẻ số */
 .flip-card-divider {
     position: absolute;
     top: 50%;
     left: 0;
     right: 0;
-    height: 3px;
-    background: rgba(0,0,0,0.8);
+    height: 2px;
+    background: rgba(0,0,0,1);
     transform: translateY(-50%);
-    box-shadow: 0 1px 0 rgba(255,255,255,0.2);
+    box-shadow: 0 1px 0 rgba(255,255,255,0.1);
     z-index: 3;
 }
 .flip-colon {
@@ -1399,22 +1438,30 @@ body.is-fullscreen-timer .btn-fullscreen {
     50% { opacity: 0.2; }
 }
 
-/* Flip Animation class triggered by JS */
-.flip-animate .flip-card-inner {
-    animation: flip-flop 0.5s ease-out forwards;
+/* Flip Animation */
+.flip-animate .flip-card-flap-top {
+    animation: flipTop 0.25s ease-in forwards;
 }
 
-@keyframes flip-flop {
-    0% { transform: scaleY(1); opacity: 1; }
-    30% { transform: scaleY(0.7); opacity: 0.8; }
-    100% { transform: scaleY(1); opacity: 1; }
+.flip-animate .flip-card-flap-bottom {
+    animation: flipBottom 0.25s ease-out 0.25s forwards;
+}
+
+@keyframes flipTop {
+    0% { transform: rotateX(0deg); }
+    100% { transform: rotateX(-90deg); }
+}
+
+@keyframes flipBottom {
+    0% { transform: rotateX(90deg); }
+    100% { transform: rotateX(0deg); }
 }
 
 /* Make flip clock bigger in fullscreen */
 body.is-fullscreen-timer .flip-card {
     width: 200px;
+    height: 240px;
     font-size: 9rem;
-    padding: 30px 20px;
 }
 body.is-fullscreen-timer .flip-colon {
     font-size: 8rem;
