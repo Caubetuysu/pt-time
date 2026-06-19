@@ -10,11 +10,15 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=1.0.17">
+    <link rel="icon" type="image/png" href="assets/favicon.png">
 </head>
 <body>
     <!-- Background grid overlay -->
     <div class="grid-background"></div>
     <div class="vignette"></div>
+    <!-- Ambient light blobs -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
 
     <div class="app-container">
         <!-- HEADER -->
@@ -115,6 +119,20 @@
                     <!-- Circular SVG Countdown Progress -->
                     <div class="timer-circle-container">
                         <svg class="timer-svg" viewBox="0 0 220 220">
+                            <defs>
+                                <linearGradient id="focusGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#00f2fe" />
+                                    <stop offset="100%" stop-color="#4facfe" />
+                                </linearGradient>
+                                <linearGradient id="breakGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#ff0844" />
+                                    <stop offset="100%" stop-color="#ffb199" />
+                                </linearGradient>
+                                <linearGradient id="ieltsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" stop-color="#00f260" />
+                                    <stop offset="100%" stop-color="#0575e6" />
+                                </linearGradient>
+                            </defs>
                             <circle class="timer-circle-bg" cx="110" cy="110" r="95"></circle>
                             <circle id="timer-circle-progress" class="timer-circle-fg" cx="110" cy="110" r="95"></circle>
                         </svg>

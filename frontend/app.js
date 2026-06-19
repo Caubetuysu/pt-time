@@ -604,10 +604,14 @@ async function setTimerPreset(minutes, mode) {
 function updateBadgeTheme(mode) {
     timerStateBadge.className = 'timer-badge';
     
+    // Dynamically toggle body class for cinematic background animations
+    document.body.className = document.body.className.replace(/\bmode-\S+/g, '');
+    document.body.classList.add(`mode-${mode}`);
+    
     if (mode === 'focus') {
         timerStateBadge.textContent = 'Đang tập trung';
         timerStateBadge.classList.add('status-focus');
-        timerCircleProgress.style.stroke = 'var(--neon-cyan)';
+        timerCircleProgress.style.stroke = 'url(#focusGradient)';
         
         // Auto select IELTS if mode is IELTS, else let user select
         if (selectedSubject === 'IELTS') {
@@ -618,11 +622,11 @@ function updateBadgeTheme(mode) {
     } else if (mode === 'break') {
         timerStateBadge.textContent = 'Nghỉ giải lao';
         timerStateBadge.classList.add('status-break');
-        timerCircleProgress.style.stroke = 'var(--neon-pink)';
+        timerCircleProgress.style.stroke = 'url(#breakGradient)';
     } else if (mode === 'ielts') {
         timerStateBadge.textContent = 'IELTS Speaking';
         timerStateBadge.classList.add('status-focus');
-        timerCircleProgress.style.stroke = 'var(--neon-cyan)';
+        timerCircleProgress.style.stroke = 'url(#ieltsGradient)';
         
         // Auto select IELTS subject
         selectedSubject = 'IELTS';
@@ -1208,7 +1212,23 @@ function renderChart(sessions) {
         
         // Accent color customization based on subject or just neon cyan
         if (subject === 'IELTS') {
-            barFill.style.background = 'linear-gradient(90deg, #3A86FF, #3A86FF)';
+            barFill.style.background = 'var(--ielts-gradient)';
+            barFill.style.boxShadow = '0 0 10px var(--ielts-glow)';
+        } else if (subject === 'Code') {
+            barFill.style.background = 'var(--focus-gradient)';
+            barFill.style.boxShadow = '0 0 10px var(--focus-glow)';
+        } else if (subject === 'Toán') {
+            barFill.style.background = 'linear-gradient(90deg, #f72585, #7209b7)';
+            barFill.style.boxShadow = '0 0 10px rgba(247, 37, 133, 0.35)';
+        } else if (subject === 'Văn') {
+            barFill.style.background = 'linear-gradient(90deg, #ffb703, #fb8500)';
+            barFill.style.boxShadow = '0 0 10px rgba(251, 133, 0, 0.35)';
+        } else if (subject === 'Anh') {
+            barFill.style.background = 'linear-gradient(90deg, #4cc9f0, #4361ee)';
+            barFill.style.boxShadow = '0 0 10px rgba(76, 201, 240, 0.35)';
+        } else {
+            barFill.style.background = 'var(--focus-gradient)';
+            barFill.style.boxShadow = '0 0 10px var(--focus-glow)';
         }
         
         barContainer.appendChild(barFill);
